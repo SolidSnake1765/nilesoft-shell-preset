@@ -3,3 +3,5 @@
 *.ps1 text eol=crlf
 *.cmd text eol=crlf
 *.tmpl text eol=crlf
+# .nss are Nilesoft Shell configs, not NWScript: keep them out of the language bar
+*.nss linguist-detectable=false
