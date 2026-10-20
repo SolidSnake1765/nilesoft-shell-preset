@@ -1,0 +1,540 @@
+// FFmpeg — конвертация видео, звука и картинок из контекстного меню.
+// Меню только вызывает imports/ffmpeg-run.ps1 с названием операции; все команды ffmpeg
+// и логика режимов живут в этом скрипте.
+// Режим (первый пункт меню) и настройки (подменю «Настройки») хранятся в реестре:
+//   копия  — результат кладётся рядом под новым именем, исходник не трогается;
+//   замена — результат получает имя исходника, а исходник уходит в Корзину.
+// Файл собирается скриптом dev/build_ffmpeg_nss.py — правки лучше вносить туда.
+
+// Где лежит ffmpeg, задаётся в imports/paths.nss ($ff_bin). Скрипт получает путь отсюда.
+$ff_exe  = ff_bin + '\ffmpeg.exe'
+$ff_probe = ff_bin + '\ffprobe.exe'
+$ff_play  = ff_bin + '\ffplay.exe'
+$ff_run   = '-NoProfile -ExecutionPolicy Bypass -File "' + path.combine(app.dir, 'imports', 'ffmpeg-run.ps1') + '" -FFmpeg "' + ff_exe + '"'
+$ff_key   = 'HKCU\Software\Nilesoft-FFmpeg-menu'
+
+// Какие файлы считаются видео, звуком и картинками
+$ff_video = '.mp4|.mkv|.mov|.avi|.webm|.m4v|.ts|.mts|.m2ts|.flv|.wmv|.mpg|.mpeg|.3gp|.vob|.ogv'
+$ff_audio = '.mp3|.m4a|.aac|.flac|.wav|.ogg|.opus|.wma|.ac3|.dts|.aiff|.ape|.wv|.mka'
+$ff_image = '.jpg|.jpeg|.png|.webp|.avif|.bmp|.tif|.tiff|.gif'
+
+$svg_ffmpeg = '<svg width="100" height="100" viewBox="0 0 48 48"><path fill="#388e3c" d="M39.5 42h-9c-1 0-1.9-.6-2.3-1.5s-.2-2 .5-2.7l8.3-8.3v-3.9L21.3 41.3c-.5.5-1.1.7-1.8.7h-11c-1 0-1.9-.6-2.3-1.5s-.2-2 .5-2.7L33.5 11h-3.9L10.3 30.3c-.7.7-1.8.9-2.7.5-1-.4-1.6-1.3-1.6-2.3v-11c0-.7.3-1.3.7-1.8l4.7-4.7h-3C7.1 11 6 9.9 6 8.5S7.1 6 8.5 6h9c1 0 1.9.6 2.3 1.5s.2 2-.5 2.7L11 18.5v3.9L26.7 6.7c.5-.4 1.1-.7 1.8-.7h11c1 0 1.9.6 2.3 1.5s.2 2-.5 2.7L14.5 37h3.9l19.3-19.3c.7-.7 1.8-.9 2.7-.5s1.5 1.3 1.5 2.3v11c0 .7-.3 1.3-.7 1.8L36.5 37h3c1.4 0 2.5 1.1 2.5 2.5S40.9 42 39.5 42"/></svg>'
+
+menu(title='FFmpeg' mode='multiple' type='file' find=ff_video+'|'+ff_audio+'|'+ff_image image=image.svg(svg_ffmpeg)
+	where=path.exists(ff_exe))
+{
+	// Переключатель режима: копия / замена
+	item(mode='multiple' title=if(reg.get(ff_key, 'Mode') == 'replace', 'Режим: замена', 'Режим: копия')
+		tip=if(reg.get(ff_key, 'Mode') == 'replace', 'Исходник после обработки уходит в Корзину, результат получает его имя. Нажми, чтобы включить копию', 'Результат сохраняется рядом, исходник не трогается. Нажми, чтобы включить замену')
+		cmd=reg.set(ff_key, 'Mode', if(reg.get(ff_key, 'Mode') == 'replace', 'copy', 'replace'), reg.sz))
+	menu(mode='multiple' title='Настройки')
+	{
+		item(mode='multiple' title='Сохранять копии в подпапку «FFmpeg»' checked=if(reg.get(ff_key, 'OutDir') == 'sub', true, false)
+			tip='Выключено — результаты кладутся рядом с исходником'
+			cmd=reg.set(ff_key, 'OutDir', if(reg.get(ff_key, 'OutDir') == 'sub', 'here', 'sub'), reg.sz))
+		item(mode='multiple' where=if(reg.get(ff_key, 'GpuEnc') == 'nvenc' or reg.get(ff_key, 'GpuEnc') == 'amf' or reg.get(ff_key, 'GpuEnc') == 'qsv', true, if(reg.get(ff_key, 'GpuEnc') == 'none', false, has_gpu_hint)) title='Кодировать видео на видеокарте' checked=if(reg.get(ff_key, 'Encoder') == 'gpu', true, false)
+			tip='NVIDIA, AMD или Intel: в разы быстрее, файл чуть больше. Выключено — процессор (x264), лучше качество на мегабайт'
+			cmd=reg.set(ff_key, 'Encoder', if(reg.get(ff_key, 'Encoder') == 'gpu', 'cpu', 'gpu'), reg.sz))
+		item(mode='multiple' title='Всегда ждать Enter в конце' checked=if(reg.get(ff_key, 'Window') == 'wait', true, false)
+			tip='Выключено — после успешной обработки окно закрывается само через 3 секунды'
+			cmd=reg.set(ff_key, 'Window', if(reg.get(ff_key, 'Window') == 'wait', 'auto', 'wait'), reg.sz))
+		item(mode='multiple' title='Звуковой сигнал по окончании' checked=if(reg.get(ff_key, 'Beep') == 'on', true, false)
+			tip='Полезно для долгой обработки: можно заниматься своими делами'
+			cmd=reg.set(ff_key, 'Beep', if(reg.get(ff_key, 'Beep') == 'on', 'off', 'on'), reg.sz))
+		item(mode='multiple' title='Показать результат в проводнике' checked=if(reg.get(ff_key, 'Reveal') == 'on', true, false)
+			tip='После обработки откроется папка с выделенным результатом'
+			cmd=reg.set(ff_key, 'Reveal', if(reg.get(ff_key, 'Reveal') == 'on', 'off', 'on'), reg.sz))
+		item(mode='multiple' title='Проверить видеокарту'
+			tip='Умеет ли видеокарта кодировать видео (NVIDIA, AMD, Intel). Нужно после замены видеокарты или драйвера'
+			cmd='powershell.exe' args='@ff_run -Preset gpu-detect')
+	}
+	separator()
+	menu(mode='multiple' expanded=1 find=ff_video)
+	{
+		menu(mode='multiple' title='В MP4 без потери качества' tip='Для файлов, которые Telegram и телефоны не принимают как видео')
+		{
+			item(mode='multiple' title='Автоматически (для Telegram)'
+				tip='Видео H.264 копируется как есть, без потерь и мгновенно. Перекодируется только то, что не подходит для MP4'
+				cmd='powershell.exe' args='@ff_run -Preset hq -Value auto @sel(true," ")')
+			separator()
+			item(mode='multiple' title='H.264 на процессоре'
+				tip='Визуально без потерь (CRF 17). Открывается везде'
+				cmd='powershell.exe' args='@ff_run -Preset hq -Value h264 @sel(true," ")')
+			item(mode='multiple' where=if(reg.get(ff_key, 'GpuEnc') == 'nvenc' or reg.get(ff_key, 'GpuEnc') == 'amf' or reg.get(ff_key, 'GpuEnc') == 'qsv', true, if(reg.get(ff_key, 'GpuEnc') == 'none', false, has_gpu_hint)) title='H.264 на видеокарте'
+				tip='Визуально без потерь, в разы быстрее. Файл больше, чем на процессоре'
+				cmd='powershell.exe' args='@ff_run -Preset hq -Value h264gpu @sel(true," ")')
+			item(mode='multiple' title='H.265 на процессоре'
+				tip='Визуально без потерь, файл меньше. Не все клиенты Telegram его показывают'
+				cmd='powershell.exe' args='@ff_run -Preset hq -Value h265 @sel(true," ")')
+			item(mode='multiple' where=if(reg.get(ff_key, 'GpuEnc') == 'nvenc' or reg.get(ff_key, 'GpuEnc') == 'amf' or reg.get(ff_key, 'GpuEnc') == 'qsv', true, if(reg.get(ff_key, 'GpuEnc') == 'none', false, has_gpu_hint)) title='H.265 на видеокарте'
+				tip='Визуально без потерь, быстро. Не все клиенты Telegram его показывают'
+				cmd='powershell.exe' args='@ff_run -Preset hq -Value h265gpu @sel(true," ")')
+		}
+		menu(mode='multiple' title='Сжать')
+		{
+			item(mode='multiple' title='H.264 (совместимо со всем)'
+				tip='Заметно меньше размер при хорошем качестве'
+				cmd='powershell.exe' args='@ff_run -Preset compress @sel(true," ")')
+			item(mode='multiple' title='H.265 (ещё меньше, дольше)'
+				tip='Меньше размер при том же качестве, но кодирует дольше'
+				cmd='powershell.exe' args='@ff_run -Preset h265 @sel(true," ")')
+			item(mode='multiple' where=if(reg.get(ff_key, 'GpuEnc') == 'nvenc' or reg.get(ff_key, 'GpuEnc') == 'amf' or reg.get(ff_key, 'GpuEnc') == 'qsv', true, if(reg.get(ff_key, 'GpuEnc') == 'none', false, has_gpu_hint)) title='На видеокарте (H.265, быстро)'
+				tip='Во много раз быстрее, файл немного больше'
+				cmd='powershell.exe' args='@ff_run -Preset gpu265 @sel(true," ")')
+		}
+		menu(mode='multiple' title='Ужать под лимит' tip='Любое видео гарантированно влезет в лимит: разрешение и частота кадров подбираются под его длину')
+		{
+			menu(mode='multiple' title='Discord — 20 МБ')
+			{
+				item(mode='multiple' title='Авто — баланс'
+					tip='Сам подбирает разрешение и частоту кадров под длину видео'
+					cmd='powershell.exe' args='@ff_run -Preset fit -Value discord20:auto:h264 @sel(true," ")')
+				item(mode='multiple' title='Плавность — 60 fps'
+					tip='Для игр: держит 60 кадров, жертвуя разрешением'
+					cmd='powershell.exe' args='@ff_run -Preset fit -Value discord20:smooth:h264 @sel(true," ")')
+				item(mode='multiple' title='Чёткость — 30 fps'
+					tip='Для разговоров и записи экрана: 30 кадров, зато разрешение выше'
+					cmd='powershell.exe' args='@ff_run -Preset fit -Value discord20:sharp:h264 @sel(true," ")')
+				separator()
+				item(mode='multiple' title='Авто, H.265 — лучше качество'
+					tip='Чётче при том же размере. Discord его поддерживает, но на старых компьютерах встроенный плеер может не показать видео'
+					cmd='powershell.exe' args='@ff_run -Preset fit -Value discord20:auto:h265 @sel(true," ")')
+			}
+			menu(mode='multiple' title='Discord — 10 МБ (старый лимит)')
+			{
+				item(mode='multiple' title='Авто — баланс'
+					tip='Сам подбирает разрешение и частоту кадров под длину видео'
+					cmd='powershell.exe' args='@ff_run -Preset fit -Value discord10:auto:h264 @sel(true," ")')
+				item(mode='multiple' title='Плавность — 60 fps'
+					tip='Для игр: держит 60 кадров, жертвуя разрешением'
+					cmd='powershell.exe' args='@ff_run -Preset fit -Value discord10:smooth:h264 @sel(true," ")')
+				item(mode='multiple' title='Чёткость — 30 fps'
+					tip='Для разговоров и записи экрана: 30 кадров, зато разрешение выше'
+					cmd='powershell.exe' args='@ff_run -Preset fit -Value discord10:sharp:h264 @sel(true," ")')
+				separator()
+				item(mode='multiple' title='Авто, H.265 — лучше качество'
+					tip='Чётче при том же размере. Discord его поддерживает, но на старых компьютерах встроенный плеер может не показать видео'
+					cmd='powershell.exe' args='@ff_run -Preset fit -Value discord10:auto:h265 @sel(true," ")')
+			}
+			menu(mode='multiple' title='Catbox — 200 МБ')
+			{
+				item(mode='multiple' title='Авто — баланс'
+					tip='Сам подбирает разрешение и частоту кадров под длину видео'
+					cmd='powershell.exe' args='@ff_run -Preset fit -Value catbox:auto:h264 @sel(true," ")')
+				item(mode='multiple' title='Плавность — 60 fps'
+					tip='Для игр: держит 60 кадров, жертвуя разрешением'
+					cmd='powershell.exe' args='@ff_run -Preset fit -Value catbox:smooth:h264 @sel(true," ")')
+				item(mode='multiple' title='Чёткость — 30 fps'
+					tip='Для разговоров и записи экрана: 30 кадров, зато разрешение выше'
+					cmd='powershell.exe' args='@ff_run -Preset fit -Value catbox:sharp:h264 @sel(true," ")')
+				separator()
+				item(mode='multiple' title='Авто, H.265 — лучше качество'
+					tip='Чётче при том же размере, но не все браузеры (например Firefox) показывают H.265'
+					cmd='powershell.exe' args='@ff_run -Preset fit -Value catbox:auto:h265 @sel(true," ")')
+			}
+			separator()
+			menu(mode='multiple' title='Свой размер…' tip='Спросит, сколько мегабайт должен весить результат')
+			{
+				item(mode='multiple' title='Авто — баланс'
+					tip='Сам подбирает разрешение и частоту кадров под длину видео'
+					cmd='powershell.exe' args='@ff_run -Preset fit -Value custom:auto:h264 @sel(true," ")')
+				item(mode='multiple' title='Плавность — 60 fps'
+					tip='Для игр: держит 60 кадров, жертвуя разрешением'
+					cmd='powershell.exe' args='@ff_run -Preset fit -Value custom:smooth:h264 @sel(true," ")')
+				item(mode='multiple' title='Чёткость — 30 fps'
+					tip='Для разговоров и записи экрана: 30 кадров, зато разрешение выше'
+					cmd='powershell.exe' args='@ff_run -Preset fit -Value custom:sharp:h264 @sel(true," ")')
+				separator()
+				item(mode='multiple' title='Авто, H.265 — лучше качество'
+					tip='Чётче при том же размере, но не все браузеры (например Firefox) показывают H.265'
+					cmd='powershell.exe' args='@ff_run -Preset fit -Value custom:auto:h265 @sel(true," ")')
+			}
+		}
+		menu(mode='multiple' title='Уменьшить')
+		{
+			item(mode='multiple' title='До 1080p'
+				tip='Пропорции сохраняются, меньшее видео не увеличивается'
+				cmd='powershell.exe' args='@ff_run -Preset height -Value 1080 @sel(true," ")')
+			item(mode='multiple' title='До 720p'
+				tip='Пропорции сохраняются, меньшее видео не увеличивается'
+				cmd='powershell.exe' args='@ff_run -Preset height -Value 720 @sel(true," ")')
+			item(mode='multiple' title='До 480p'
+				tip='Пропорции сохраняются, меньшее видео не увеличивается'
+				cmd='powershell.exe' args='@ff_run -Preset height -Value 480 @sel(true," ")')
+		}
+		menu(mode='multiple' title='Обрезать')
+		{
+			item(mode='multiple' title='Быстро, без перекодирования…'
+				tip='Спросит начало и конец. Мгновенно, но режет по ближайшим ключевым кадрам'
+				cmd='powershell.exe' args='@ff_run -Preset trim @sel(true," ")')
+			item(mode='multiple' title='Точно, с перекодированием…'
+				tip='Спросит начало и конец. Режет ровно по указанному времени'
+				cmd='powershell.exe' args='@ff_run -Preset trim-exact @sel(true," ")')
+		}
+		menu(mode='multiple' title='Скорость' tip='Звук ускоряется вместе с видео, высота голоса не меняется')
+		{
+			item(mode='multiple' title='0.5×'
+				cmd='powershell.exe' args='@ff_run -Preset speed -Value 0.5 @sel(true," ")')
+			item(mode='multiple' title='0.75×'
+				cmd='powershell.exe' args='@ff_run -Preset speed -Value 0.75 @sel(true," ")')
+			item(mode='multiple' title='1.25×'
+				cmd='powershell.exe' args='@ff_run -Preset speed -Value 1.25 @sel(true," ")')
+			item(mode='multiple' title='1.5×'
+				cmd='powershell.exe' args='@ff_run -Preset speed -Value 1.5 @sel(true," ")')
+			item(mode='multiple' title='2×'
+				cmd='powershell.exe' args='@ff_run -Preset speed -Value 2 @sel(true," ")')
+		}
+		menu(mode='multiple' title='Частота кадров' tip='60 из 30 не делает движение плавнее — кадры просто повторяются')
+		{
+			item(mode='multiple' title='30 fps'
+				cmd='powershell.exe' args='@ff_run -Preset fps -Value 30 @sel(true," ")')
+			item(mode='multiple' title='60 fps'
+				cmd='powershell.exe' args='@ff_run -Preset fps -Value 60 @sel(true," ")')
+		}
+		menu(mode='multiple' title='Повернуть' tip='Обычные пункты перекодируют видео в MP4 (H.264 высокого качества)')
+		{
+			menu(mode='multiple' find='.mp4|.mov|.m4v' title='Мгновенно, без перекодирования' tip='Меняется только метка поворота — без потерь. Для роликов с телефона, которые показываются боком')
+			{
+				item(mode='multiple' title='На 90° вправо'
+					cmd='powershell.exe' args='@ff_run -Preset lrotate -Value right @sel(true," ")')
+				item(mode='multiple' title='На 90° влево'
+					cmd='powershell.exe' args='@ff_run -Preset lrotate -Value left @sel(true," ")')
+				item(mode='multiple' title='На 180°'
+					cmd='powershell.exe' args='@ff_run -Preset lrotate -Value 180 @sel(true," ")')
+			}
+			separator()
+			item(mode='multiple' title='На 90° вправо'
+				cmd='powershell.exe' args='@ff_run -Preset vrotate -Value right @sel(true," ")')
+			item(mode='multiple' title='На 90° влево'
+				cmd='powershell.exe' args='@ff_run -Preset vrotate -Value left @sel(true," ")')
+			item(mode='multiple' title='На 180°'
+				cmd='powershell.exe' args='@ff_run -Preset vrotate -Value 180 @sel(true," ")')
+			separator()
+			item(mode='multiple' title='Отразить по горизонтали'
+				cmd='powershell.exe' args='@ff_run -Preset vrotate -Value hflip @sel(true," ")')
+			item(mode='multiple' title='Отразить по вертикали'
+				cmd='powershell.exe' args='@ff_run -Preset vrotate -Value vflip @sel(true," ")')
+		}
+		menu(mode='multiple' title='Улучшить' tip='Все пункты перекодируют видео в MP4')
+		{
+			item(mode='multiple' title='Стабилизировать (убрать тряску)'
+				tip='Два прохода: анализ движения и выравнивание. Края слегка обрезаются'
+				cmd='powershell.exe' args='@ff_run -Preset stab @sel(true," ")')
+			item(mode='multiple' title='Убрать шум'
+				tip='Для тёмных и зернистых видео с телефона'
+				cmd='powershell.exe' args='@ff_run -Preset denoise @sel(true," ")')
+			item(mode='multiple' title='Добавить резкость'
+				tip='Подчёркивает детали, если видео выглядит мыльным'
+				cmd='powershell.exe' args='@ff_run -Preset sharpen @sel(true," ")')
+			item(mode='multiple' title='Убрать чёрные полосы'
+				tip='Сам находит полосы сверху/снизу/по бокам и обрезает их'
+				cmd='powershell.exe' args='@ff_run -Preset crop @sel(true," ")')
+			item(mode='multiple' title='Убрать «гребёнку» (чересстрочность)'
+				tip='Для старых записей с камер и ТВ'
+				cmd='powershell.exe' args='@ff_run -Preset deint @sel(true," ")')
+			item(mode='multiple' title='Плавность 60 fps (дорисовка кадров)'
+				tip='Дорисовывает промежуточные кадры. Очень медленно — для коротких роликов'
+				cmd='powershell.exe' args='@ff_run -Preset interp @sel(true," ")')
+		}
+		menu(mode='multiple' title='Перепаковать без перекодирования')
+		{
+			item(mode='multiple' title='В MP4'
+				tip='Мгновенно и без потерь. Не сработает, если кодеки не подходят для MP4'
+				cmd='powershell.exe' args='@ff_run -Preset remux-mp4 @sel(true," ")')
+			item(mode='multiple' title='В MKV'
+				tip='Мгновенно и без потерь, все дорожки и субтитры сохраняются'
+				cmd='powershell.exe' args='@ff_run -Preset remux-mkv @sel(true," ")')
+		}
+		item(mode='multiple' where=sel.count>1 title='Склеить выбранные в один файл'
+			tip='По алфавиту, без перекодирования. Файлы должны быть с одинаковыми параметрами (например, части одной записи)'
+			cmd='powershell.exe' args='@ff_run -Preset concat @sel(true," ")')
+		item(mode='multiple' title='Разрезать на части…'
+			tip='Спросит, по сколько минут. Без перекодирования'
+			cmd='powershell.exe' args='@ff_run -Preset split @sel(true," ")')
+		item(mode='multiple' title='Удалить метаданные (GPS, камера, даты)'
+			tip='Перед тем как выложить видео с телефона. Без перекодирования'
+			cmd='powershell.exe' args='@ff_run -Preset stripmeta @sel(true," ")')
+		menu(mode='multiple' title='Субтитры')
+		{
+			item(mode='multiple' title='Извлечь все в отдельные файлы'
+				tip='SRT, ASS, VTT, SUP — рядом с видео'
+				cmd='powershell.exe' args='@ff_run -Preset subs-extract @sel(true," ")')
+			item(mode='multiple' title='Добавить файл, лежащий рядом'
+				tip='Берёт «имя.srt» или «имя.ru.srt» (.ass, .vtt) и добавляет дорожкой в MKV, включаемой в плеере'
+				cmd='powershell.exe' args='@ff_run -Preset subs-add @sel(true," ")')
+			item(mode='multiple' title='Вшить в картинку'
+				tip='Субтитры навсегда в кадре — видны везде. Берёт файл рядом или встроенные субтитры'
+				cmd='powershell.exe' args='@ff_run -Preset subs-burn @sel(true," ")')
+		}
+		separator()
+		menu(mode='multiple' title='Звук')
+		{
+			menu(mode='multiple' title='Извлечь' tip='Всегда создаёт новый файл, видео не трогается')
+			{
+				item(mode='multiple' title='MP3 (320 кбит/с)'
+					cmd='powershell.exe' args='@ff_run -Preset extract -Value mp3 @sel(true," ")')
+				item(mode='multiple' title='M4A (AAC 256 кбит/с)'
+					cmd='powershell.exe' args='@ff_run -Preset extract -Value m4a @sel(true," ")')
+				item(mode='multiple' title='AAC (256 кбит/с)'
+					cmd='powershell.exe' args='@ff_run -Preset extract -Value aac @sel(true," ")')
+				item(mode='multiple' title='OPUS (160 кбит/с)'
+					cmd='powershell.exe' args='@ff_run -Preset extract -Value opus @sel(true," ")')
+				item(mode='multiple' title='OGG (Vorbis)'
+					cmd='powershell.exe' args='@ff_run -Preset extract -Value ogg @sel(true," ")')
+				item(mode='multiple' title='FLAC (без потерь)'
+					cmd='powershell.exe' args='@ff_run -Preset extract -Value flac @sel(true," ")')
+				item(mode='multiple' title='WAV'
+					cmd='powershell.exe' args='@ff_run -Preset extract -Value wav @sel(true," ")')
+				item(mode='multiple' title='AIFF'
+					cmd='powershell.exe' args='@ff_run -Preset extract -Value aiff @sel(true," ")')
+				separator()
+				item(mode='multiple' title='Как есть, без перекодирования (MKA)'
+					tip='Дорожка без изменений. MKA открывают AIMP, VLC и MPC-HC'
+					cmd='powershell.exe' args='@ff_run -Preset extract -Value mka @sel(true," ")')
+			}
+			item(mode='multiple' title='Убрать звук'
+				tip='Копия видео без звуковой дорожки, без перекодирования'
+				cmd='powershell.exe' args='@ff_run -Preset mute @sel(true," ")')
+			item(mode='multiple' title='Выбрать звуковую дорожку…'
+				tip='Покажет список дорожек с языками и оставит одну. Без перекодирования'
+				cmd='powershell.exe' args='@ff_run -Preset pickaudio @sel(true," ")')
+			item(mode='multiple' title='Убрать шум из голоса'
+				tip='Шумоподавление и срез гула. Видео не перекодируется'
+				cmd='powershell.exe' args='@ff_run -Preset voice @sel(true," ")')
+			separator()
+			menu(mode='multiple' title='Громче' tip='+6 дБ — примерно вдвое громче по амплитуде')
+			{
+				item(mode='multiple' title='+3 дБ'
+					cmd='powershell.exe' args='@ff_run -Preset louder -Value 3 @sel(true," ")')
+				item(mode='multiple' title='+6 дБ'
+					cmd='powershell.exe' args='@ff_run -Preset louder -Value 6 @sel(true," ")')
+				item(mode='multiple' title='+10 дБ'
+					cmd='powershell.exe' args='@ff_run -Preset louder -Value 10 @sel(true," ")')
+			}
+			menu(mode='multiple' title='Тише')
+			{
+				item(mode='multiple' title='-3 дБ'
+					cmd='powershell.exe' args='@ff_run -Preset quieter -Value 3 @sel(true," ")')
+				item(mode='multiple' title='-6 дБ'
+					cmd='powershell.exe' args='@ff_run -Preset quieter -Value 6 @sel(true," ")')
+				item(mode='multiple' title='-10 дБ'
+					cmd='powershell.exe' args='@ff_run -Preset quieter -Value 10 @sel(true," ")')
+			}
+			item(mode='multiple' title='Выровнять громкость'
+				tip='Привести к стандартной громкости (EBU R128, -16 LUFS)'
+				cmd='powershell.exe' args='@ff_run -Preset normalize @sel(true," ")')
+		}
+		menu(mode='multiple' title='Создать из видео' tip='Всегда создаёт новый файл, видео не трогается')
+		{
+			menu(mode='multiple' title='GIF')
+			{
+				item(mode='multiple' title='Маленький (320 px, 10 к/с, 64 цвета)'
+					tip='Самый лёгкий файл — для мессенджеров'
+					cmd='powershell.exe' args='@ff_run -Preset gif -Value 1 @sel(true," ")')
+				item(mode='multiple' title='Средний (400 px, 12 к/с)'
+					tip='Баланс размера и качества'
+					cmd='powershell.exe' args='@ff_run -Preset gif -Value 2 @sel(true," ")')
+				item(mode='multiple' title='Качественный (480 px, 15 к/с)'
+					tip='Лучшие цвета и плавность, файл больше'
+					cmd='powershell.exe' args='@ff_run -Preset gif -Value 3 @sel(true," ")')
+			}
+			item(mode='multiple' title='Вертикальное 9:16 (Shorts, TikTok, Reels)'
+				tip='1080×1920: видео по центру на размытом фоне'
+				cmd='powershell.exe' args='@ff_run -Preset vertical @sel(true," ")')
+			item(mode='multiple' title='Кадр из середины (JPG)'
+				cmd='powershell.exe' args='@ff_run -Preset frame @sel(true," ")')
+			item(mode='multiple' title='Превью-сетка 4×4 (JPG)'
+				tip='16 кадров с равным шагом по всему видео на одной картинке'
+				cmd='powershell.exe' args='@ff_run -Preset sheet @sel(true," ")')
+			item(mode='multiple' title='Задом наперёд'
+				tip='Для коротких роликов: длинное видео займёт много памяти'
+				cmd='powershell.exe' args='@ff_run -Preset reverse @sel(true," ")')
+			separator()
+			item(mode='multiple' title='Кадры каждые N секунд в папку…'
+				tip='Спросит интервал и сохранит JPG в отдельную папку'
+				cmd='powershell.exe' args='@ff_run -Preset frames @sel(true," ")')
+			item(mode='multiple' title='Нарезка-превью (6 фрагментов по 2 с)'
+				tip='Короткий ролик из кусочков по всему видео — показать, о чём оно'
+				cmd='powershell.exe' args='@ff_run -Preset teaser @sel(true," ")')
+		}
+	}
+	menu(mode='multiple' expanded=1 find=ff_audio)
+	{
+		menu(mode='multiple' title='Конвертировать')
+		{
+			item(mode='multiple' find='!.mp3' title='В MP3 (320 кбит/с)'
+				cmd='powershell.exe' args='@ff_run -Preset audio -Value mp3 @sel(true," ")')
+			item(mode='multiple' title='В MP3 (VBR, около 190 кбит/с)'
+				tip='Почти то же качество, файл меньше'
+				cmd='powershell.exe' args='@ff_run -Preset audio -Value mp3vbr @sel(true," ")')
+			item(mode='multiple' find='!.m4a' title='В M4A (AAC 256 кбит/с)'
+				cmd='powershell.exe' args='@ff_run -Preset audio -Value m4a @sel(true," ")')
+			item(mode='multiple' find='!.opus' title='В OPUS (160 кбит/с)'
+				tip='Самый современный кодек: лучшее качество на килобайт'
+				cmd='powershell.exe' args='@ff_run -Preset audio -Value opus @sel(true," ")')
+			item(mode='multiple' find='!.ogg' title='В OGG (Vorbis)'
+				cmd='powershell.exe' args='@ff_run -Preset audio -Value ogg @sel(true," ")')
+			item(mode='multiple' find='!.flac' title='В FLAC (без потерь)'
+				cmd='powershell.exe' args='@ff_run -Preset audio -Value flac @sel(true," ")')
+			item(mode='multiple' find='!.wav' title='В WAV'
+				cmd='powershell.exe' args='@ff_run -Preset audio -Value wav @sel(true," ")')
+			item(mode='multiple' find='!.aiff' title='В AIFF'
+				cmd='powershell.exe' args='@ff_run -Preset audio -Value aiff @sel(true," ")')
+		}
+		menu(mode='multiple' title='Громче' tip='+6 дБ — примерно вдвое громче по амплитуде')
+		{
+			item(mode='multiple' title='+3 дБ'
+				cmd='powershell.exe' args='@ff_run -Preset louder -Value 3 @sel(true," ")')
+			item(mode='multiple' title='+6 дБ'
+				cmd='powershell.exe' args='@ff_run -Preset louder -Value 6 @sel(true," ")')
+			item(mode='multiple' title='+10 дБ'
+				cmd='powershell.exe' args='@ff_run -Preset louder -Value 10 @sel(true," ")')
+		}
+		menu(mode='multiple' title='Тише')
+		{
+			item(mode='multiple' title='-3 дБ'
+				cmd='powershell.exe' args='@ff_run -Preset quieter -Value 3 @sel(true," ")')
+			item(mode='multiple' title='-6 дБ'
+				cmd='powershell.exe' args='@ff_run -Preset quieter -Value 6 @sel(true," ")')
+			item(mode='multiple' title='-10 дБ'
+				cmd='powershell.exe' args='@ff_run -Preset quieter -Value 10 @sel(true," ")')
+		}
+		item(mode='multiple' title='Выровнять громкость'
+			tip='Привести к стандартной громкости (EBU R128, -16 LUFS)'
+			cmd='powershell.exe' args='@ff_run -Preset normalize @sel(true," ")')
+		item(mode='multiple' title='Убрать тишину в начале и в конце'
+			tip='Отрезает тишину тише -50 дБ по краям'
+			cmd='powershell.exe' args='@ff_run -Preset silence @sel(true," ")')
+		item(mode='multiple' title='Обрезать…'
+			tip='Спросит начало и конец, без перекодирования'
+			cmd='powershell.exe' args='@ff_run -Preset trim @sel(true," ")')
+		menu(mode='multiple' title='Скорость' tip='Высота голоса не меняется')
+		{
+			item(mode='multiple' title='0.5×'
+				cmd='powershell.exe' args='@ff_run -Preset speed -Value 0.5 @sel(true," ")')
+			item(mode='multiple' title='0.75×'
+				cmd='powershell.exe' args='@ff_run -Preset speed -Value 0.75 @sel(true," ")')
+			item(mode='multiple' title='1.25×'
+				cmd='powershell.exe' args='@ff_run -Preset speed -Value 1.25 @sel(true," ")')
+			item(mode='multiple' title='1.5×'
+				cmd='powershell.exe' args='@ff_run -Preset speed -Value 1.5 @sel(true," ")')
+			item(mode='multiple' title='2×'
+				cmd='powershell.exe' args='@ff_run -Preset speed -Value 2 @sel(true," ")')
+		}
+		item(mode='multiple' where=sel.count>1 title='Склеить выбранные в один файл'
+			tip='По алфавиту, без перекодирования. Файлы должны быть одного формата'
+			cmd='powershell.exe' args='@ff_run -Preset concat @sel(true," ")')
+		item(mode='multiple' title='Разрезать на части…'
+			tip='Спросит, по сколько минут. Без перекодирования'
+			cmd='powershell.exe' args='@ff_run -Preset split @sel(true," ")')
+		item(mode='multiple' title='Убрать шум из голоса'
+			tip='Для записей голоса, подкастов и диктофона'
+			cmd='powershell.exe' args='@ff_run -Preset voice @sel(true," ")')
+		separator()
+		item(mode='multiple' title='Сделать видео (обложка или волна)'
+			tip='Для YouTube и Telegram: картинка — обложка из файла, а если её нет — волна звука'
+			cmd='powershell.exe' args='@ff_run -Preset musicvideo @sel(true," ")')
+		item(mode='multiple' title='Спектрограмма (PNG)'
+			tip='Видно настоящее качество: у «раздутого» из MP3 FLAC всё выше 16 кГц срезано'
+			cmd='powershell.exe' args='@ff_run -Preset spectrum @sel(true," ")')
+		item(mode='multiple' title='Удалить метаданные'
+			tip='Теги, обложка остаются в потоке. Без перекодирования'
+			cmd='powershell.exe' args='@ff_run -Preset stripmeta @sel(true," ")')
+	}
+	menu(mode='multiple' expanded=1 find=ff_image)
+	{
+		menu(mode='multiple' title='Конвертировать')
+		{
+			item(mode='multiple' find='!.jpg' title='В JPG'
+				cmd='powershell.exe' args='@ff_run -Preset image -Value jpg @sel(true," ")')
+			item(mode='multiple' find='!.png' title='В PNG'
+				tip='Без потерь'
+				cmd='powershell.exe' args='@ff_run -Preset image -Value png @sel(true," ")')
+			item(mode='multiple' find='!.webp' title='В WebP (качество 90)'
+				tip='Меньше JPG при том же качестве'
+				cmd='powershell.exe' args='@ff_run -Preset image -Value webp @sel(true," ")')
+			item(mode='multiple' find='!.avif' title='В AVIF'
+				tip='Самый компактный формат, открывается в новых браузерах и Windows 11'
+				cmd='powershell.exe' args='@ff_run -Preset image -Value avif @sel(true," ")')
+			separator()
+			item(mode='multiple' title='В иконку ICO (256×256)'
+				tip='Картинка вписывается в квадрат, по краям прозрачные поля'
+				cmd='powershell.exe' args='@ff_run -Preset ico @sel(true," ")')
+			item(mode='multiple' title='Сжать для сайтов (WebP, до 2560 px)'
+				tip='Для блогов, форумов и сайтов: маленький файл, хорошее качество'
+				cmd='powershell.exe' args='@ff_run -Preset web @sel(true," ")')
+		}
+		menu(mode='multiple' title='Увеличить' tip='Простое увеличение (lanczos): картинка больше, но новых деталей не появится')
+		{
+			item(mode='multiple' title='×2'
+				cmd='powershell.exe' args='@ff_run -Preset upscale -Value 2 @sel(true," ")')
+			item(mode='multiple' title='×3'
+				cmd='powershell.exe' args='@ff_run -Preset upscale -Value 3 @sel(true," ")')
+			item(mode='multiple' title='×4'
+				cmd='powershell.exe' args='@ff_run -Preset upscale -Value 4 @sel(true," ")')
+			item(mode='multiple' title='×5'
+				cmd='powershell.exe' args='@ff_run -Preset upscale -Value 5 @sel(true," ")')
+			item(mode='multiple' title='×6'
+				cmd='powershell.exe' args='@ff_run -Preset upscale -Value 6 @sel(true," ")')
+			item(mode='multiple' title='×7'
+				cmd='powershell.exe' args='@ff_run -Preset upscale -Value 7 @sel(true," ")')
+			item(mode='multiple' title='×8'
+				cmd='powershell.exe' args='@ff_run -Preset upscale -Value 8 @sel(true," ")')
+			item(mode='multiple' title='×9'
+				cmd='powershell.exe' args='@ff_run -Preset upscale -Value 9 @sel(true," ")')
+			item(mode='multiple' title='×10'
+				cmd='powershell.exe' args='@ff_run -Preset upscale -Value 10 @sel(true," ")')
+		}
+		menu(mode='multiple' title='Уменьшить')
+		{
+			item(mode='multiple' title='В 2 раза'
+				cmd='powershell.exe' args='@ff_run -Preset downscale -Value 2 @sel(true," ")')
+			item(mode='multiple' title='В 3 раза'
+				cmd='powershell.exe' args='@ff_run -Preset downscale -Value 3 @sel(true," ")')
+			item(mode='multiple' title='В 4 раза'
+				cmd='powershell.exe' args='@ff_run -Preset downscale -Value 4 @sel(true," ")')
+		}
+		menu(mode='multiple' title='Повернуть')
+		{
+			item(mode='multiple' title='На 90° вправо'
+				cmd='powershell.exe' args='@ff_run -Preset irotate -Value right @sel(true," ")')
+			item(mode='multiple' title='На 90° влево'
+				cmd='powershell.exe' args='@ff_run -Preset irotate -Value left @sel(true," ")')
+			item(mode='multiple' title='На 180°'
+				cmd='powershell.exe' args='@ff_run -Preset irotate -Value 180 @sel(true," ")')
+			separator()
+			item(mode='multiple' title='Отразить по горизонтали'
+				cmd='powershell.exe' args='@ff_run -Preset irotate -Value hflip @sel(true," ")')
+			item(mode='multiple' title='Отразить по вертикали'
+				cmd='powershell.exe' args='@ff_run -Preset irotate -Value vflip @sel(true," ")')
+		}
+		item(mode='multiple' title='Чёрно-белое'
+			cmd='powershell.exe' args='@ff_run -Preset gray @sel(true," ")')
+		item(mode='multiple' where=sel.count>1 title='Слайд-шоу из выбранных (MP4)'
+			tip='По алфавиту, 1920×1080. Спросит, сколько секунд показывать каждую'
+			cmd='powershell.exe' args='@ff_run -Preset slideshow @sel(true," ")')
+	}
+	separator()
+	// Информация
+	menu(mode='multiple' where=sel.count==2 title='Видео + музыка' tip='Выдели одно видео и один аудиофайл')
+	{
+		item(mode='multiple' title='Заменить звук музыкой'
+			tip='Звук видео заменяется выбранным файлом; короткая музыка повторяется по кругу'
+			cmd='powershell.exe' args='@ff_run -Preset addaudio -Value replace @sel(true," ")')
+		item(mode='multiple' title='Добавить музыку фоном'
+			tip='Музыка тише и звучит поверх родного звука видео; короткая повторяется по кругу'
+			cmd='powershell.exe' args='@ff_run -Preset addaudio -Value mix @sel(true," ")')
+	}
+	menu(mode='multiple' expanded=1 find=ff_video+'|'+ff_audio)
+	{
+		item(mode='multiple' title='Проверить на ошибки'
+			tip='Полное декодирование: покажет, есть ли в файле битые места'
+			cmd='powershell.exe' args='@ff_run -Preset check @sel(true," ")')
+	}
+	item(mode='multiple' title='Сведения о файле' tip='Кодеки, разрешение, длительность, битрейт'
+		cmd-line=`/c (for %f in (@(sel(true," "))) do (echo. & "@ff_probe" -hide_banner "%~f")) & echo. & pause`)
+	item(mode='single' find=ff_video+'|'+ff_audio title='Воспроизвести в ffplay' tip='Пробел — пауза, Esc — закрыть'
+		cmd=ff_play args='-hide_banner "@sel.path"')
+	item(mode='multiple' title='Версия FFmpeg' keys='Shift' vis=key.shift()
+		cmd-line=`/c ("@ff_exe" -hide_banner -version) & pause`)
+}

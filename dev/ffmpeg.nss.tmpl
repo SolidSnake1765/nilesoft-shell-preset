@@ -1,0 +1,27 @@
+// FFmpeg — конвертация видео, звука и картинок из контекстного меню.
+// Меню только вызывает imports/ffmpeg-run.ps1 с названием операции; все команды ffmpeg
+// и логика режимов живут в этом скрипте.
+// Режим (первый пункт меню) и настройки (подменю «Настройки») хранятся в реестре:
+//   копия  — результат кладётся рядом под новым именем, исходник не трогается;
+//   замена — результат получает имя исходника, а исходник уходит в Корзину.
+// Файл собирается скриптом dev/build_ffmpeg_nss.py — правки лучше вносить туда.
+
+// Где лежит ffmpeg, задаётся в imports/paths.nss ($ff_bin). Скрипт получает путь отсюда.
+$ff_exe  = ff_bin + 'BSffmpeg.exe'
+$ff_probe = ff_bin + 'BSffprobe.exe'
+$ff_play  = ff_bin + 'BSffplay.exe'
+$ff_run   = '-NoProfile -ExecutionPolicy Bypass -File "' + path.combine(app.dir, 'imports', 'ffmpeg-run.ps1') + '" -FFmpeg "' + ff_exe + '"'
+$ff_key   = 'HKCUBSSoftwareBSNilesoft-FFmpeg-menu'
+
+// Какие файлы считаются видео, звуком и картинками
+$ff_video = '.mp4|.mkv|.mov|.avi|.webm|.m4v|.ts|.mts|.m2ts|.flv|.wmv|.mpg|.mpeg|.3gp|.vob|.ogv'
+$ff_audio = '.mp3|.m4a|.aac|.flac|.wav|.ogg|.opus|.wma|.ac3|.dts|.aiff|.ape|.wv|.mka'
+$ff_image = '.jpg|.jpeg|.png|.webp|.avif|.bmp|.tif|.tiff|.gif'
+
+$svg_ffmpeg = '<svg width="100" height="100" viewBox="0 0 48 48"><path fill="#388e3c" d="M39.5 42h-9c-1 0-1.9-.6-2.3-1.5s-.2-2 .5-2.7l8.3-8.3v-3.9L21.3 41.3c-.5.5-1.1.7-1.8.7h-11c-1 0-1.9-.6-2.3-1.5s-.2-2 .5-2.7L33.5 11h-3.9L10.3 30.3c-.7.7-1.8.9-2.7.5-1-.4-1.6-1.3-1.6-2.3v-11c0-.7.3-1.3.7-1.8l4.7-4.7h-3C7.1 11 6 9.9 6 8.5S7.1 6 8.5 6h9c1 0 1.9.6 2.3 1.5s.2 2-.5 2.7L11 18.5v3.9L26.7 6.7c.5-.4 1.1-.7 1.8-.7h11c1 0 1.9.6 2.3 1.5s.2 2-.5 2.7L14.5 37h3.9l19.3-19.3c.7-.7 1.8-.9 2.7-.5s1.5 1.3 1.5 2.3v11c0 .7-.3 1.3-.7 1.8L36.5 37h3c1.4 0 2.5 1.1 2.5 2.5S40.9 42 39.5 42"/></svg>'
+
+menu(title='FFmpeg' mode='multiple' type='file' find=ff_video+'|'+ff_audio+'|'+ff_image image=image.svg(svg_ffmpeg)
+	where=path.exists(ff_exe))
+{
+@@ITEMS@@
+}
