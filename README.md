@@ -1,10 +1,10 @@
 **English** | [Русский](README.ru.md)
 
-# Context menu preset for Nilesoft Shell
+# Nilesoft Shell preset: FFmpeg in the right-click menu
 
-A ready-made right-click menu for Windows Explorer: a clean translucent theme, an FFmpeg menu
-(convert and compress video, audio and images in a couple of clicks, including on the graphics card),
-Everything search, hashes, batch rename, share-as-link, disk images, power options and more.
+My personal right-click menu for Windows Explorer. The main feature is the **FFmpeg menu**: convert,
+compress, trim and fix video, audio and images in a couple of clicks, including fast encoding on
+NVIDIA, AMD and Intel graphics. Plus a clean translucent theme, Everything search, hashes, batch rename, share-as-link, disk images, power options and more.
 The menu comes in English and Russian. What every item does: [MENU.md](MENU.md).
 
 Made and tested on **Windows 11** with **Nilesoft Shell 1.9.18**.
