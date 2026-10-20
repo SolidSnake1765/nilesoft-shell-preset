@@ -282,3 +282,17 @@ $lc_exe_user = 'D:\Soft\LosslessCut\LosslessCut.exe'
 - Этот пресет — лицензия MIT, см. [LICENSE](LICENSE).
 - Nilesoft Shell и его стандартные файлы меню (`images.nss`, основа `goto`, `terminal`, `file-manage`, `taskbar`, `develop`, `modify`) — © Moudey, лицензия MIT.
 - Меню WinRAR основано на сниппете RubicBG (CC0), инструменты переписаны по мотивам его библиотеки.
+
+---
+
+## Другие мои проекты
+
+- **[Local VOT](https://github.com/SolidSnake1765/local-vot)** — закадровый перевод своих видео на русский голосами Яндекса
+  (через Яндекс Диск или Google Диск), приложение для Windows.
+- **Snake VPN** — мой личный VPN-сервис для россиян:
+  - [Бот в Telegram](https://t.me/SnakeVPNServiceBot).
+  - [snakeservice.tech](https://snakeservice.tech) — сайт сервиса. Можно пользоваться вместо бота, а можно вместе с ним:
+    подписка, устройства, оплата, поддержка. Зарегистрироваться можно через Google или Discord, Telegram не обязателен.
+  - [free.snakeservice.tech](https://free.snakeservice.tech) — бесплатные прокси для Telegram. Раньше они были внутри бота,
+    теперь на отдельном сайте. Подписка для них не нужна, так что сохраните ссылку и кидайте друзьям —
+    выручает, когда Telegram не открывается.

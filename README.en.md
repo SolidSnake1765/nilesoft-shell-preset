@@ -283,3 +283,17 @@ A few quick tips:
 - This preset: MIT license, see [LICENSE](LICENSE).
 - Nilesoft Shell and its default menu files (`images.nss`, the base of `goto`, `terminal`, `file-manage`, `taskbar`, `develop`, `modify`): © Moudey, MIT license.
 - The WinRAR menu is based on a RubicBG snippet (CC0); the tools are rewritten after his library.
+
+---
+
+## My other projects
+
+- **[Local VOT](https://github.com/SolidSnake1765/local-vot)**: Russian voice-over for your own videos with Yandex voices
+  (via Yandex Disk or Google Drive), a Windows app.
+- **Snake VPN**: my personal VPN service for users in Russia:
+  - [Telegram bot](https://t.me/SnakeVPNServiceBot).
+  - [snakeservice.tech](https://snakeservice.tech): the service website. Use it instead of the bot or together with it:
+    subscription, devices, payment, support. You can sign up with Google or Discord, Telegram is not required.
+  - [free.snakeservice.tech](https://free.snakeservice.tech): free proxies for Telegram. They used to be inside the bot,
+    now they have their own site. No subscription needed, so save the link and share it with friends:
+    it helps when Telegram does not open.
