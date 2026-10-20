@@ -8,10 +8,6 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 
 ## [Unreleased]
 
-### Changed
-- Comments in `dev/` and the header comments of the menu files (`ffmpeg.nss`, `tools.nss`) are in English.
-  The hints in `paths.nss`, which users edit, stay in the menu language.
-
 ## [1.0.0] - 2026-10-20
 
 First release.
@@ -36,6 +32,8 @@ First release.
   looks for ffmpeg, Everything and LosslessCut on all drives, checks the ffmpeg version and the graphics card, registers Nilesoft.
 - Manual setup, a portability section and a description of every item in the README.
 - Items of programs that are not installed are hidden instead of showing greyed out.
+- A `dev/` folder for those who want to change the menu: file generators, the translation dictionary and a checker
+  (comments in English; the hints in `paths.nss` are in the menu language).
 
 [Unreleased]: https://github.com/SolidSnake1765/nilesoft-shell-preset/compare/v1.0.0...HEAD
 [1.0.0]: https://github.com/SolidSnake1765/nilesoft-shell-preset/releases/tag/v1.0.0
