@@ -1,233 +1,256 @@
-**English** | [Русский](README.ru.md)
+[English](README.en.md) | **Русский**
 
-# Nilesoft Shell preset: FFmpeg in the right-click menu
+# Пресет Nilesoft Shell: FFmpeg в контекстном меню
 
-My personal right-click menu for Windows Explorer. The main feature is the **FFmpeg menu**: convert,
-compress, trim and fix video, audio and images in a couple of clicks, including fast encoding on
-NVIDIA, AMD and Intel graphics. Plus a clean translucent theme, Everything search, hashes, batch rename, share-as-link, disk images, power options and more.
-The menu comes in English and Russian. What every item does: [MENU.md](MENU.md).
+Моя личная настройка правой кнопки мыши в Проводнике Windows. Главное в ней — **меню FFmpeg**:
+конвертация, сжатие, обрезка и исправление видео, звука и картинок в пару кликов, в том числе быстрое
+кодирование на видеокартах NVIDIA, AMD и Intel. Плюс аккуратная полупрозрачная тема, поиск в Everything, хэши, массовое переименование, ссылка на файл, образы дисков, питание и многое другое.
+Меню есть на русском и на английском. Что делает каждый пункт — в [MENU.md](MENU.md).
 
-Made and tested on **Windows 11** with **Nilesoft Shell 1.9.18**.
+Сделано и проверено на **Windows 11** и **Nilesoft Shell 1.9.18**.
 
----
 
-## What is inside
+## Как это выглядит
 
-| What | Why |
+<p align="center">
+  <img src="docs/screenshots/03-ffmpeg-size-limit.png" width="560" alt="Меню FFmpeg: ужать видео под лимит Discord">
+</p>
+<p align="center">
+  <img src="docs/screenshots/09-ffmpeg-progress.png" width="700" alt="Окно FFmpeg: полоса прогресса и нагрузка на компьютер">
+</p>
+
+<details>
+<summary><b>Ещё скриншоты</b> (нажми, чтобы открыть)</summary>
+
+| | |
 |---|---|
-| `Install.cmd` | Automatic setup: run it and it does everything |
-| `config/en`, `config/ru` | The menu itself (`shell.nss` and the `imports` folder) in English and Russian |
-| `setup/install.ps1` | The setup script that `Install.cmd` starts |
-| `MENU.md`, `MENU.ru.md` | Description of every menu item |
-| `dev/` | For those who want to change the menu: file generators, the translation dictionary and a checker |
+| Главное меню на видео<br><img src="docs/screenshots/01-main.png" width="200"> | FFmpeg<br><img src="docs/screenshots/02-ffmpeg.png" width="360"> |
+| Настройки FFmpeg (видеокарта)<br><img src="docs/screenshots/04-ffmpeg-settings.png" width="420"> | Создать из видео: GIF, 9:16, кадры<br><img src="docs/screenshots/05-ffmpeg-make-from-video.png" width="420"> |
+| Массовое переименование<br><img src="docs/screenshots/06-tools-rename.png" width="420"> | Поиск в Everything<br><img src="docs/screenshots/07-everything.png" width="300"> |
+| Умное выделение<br><img src="docs/screenshots/08-smart-select.png" width="420"> | |
 
-Download: the green **Code → Download ZIP** button on GitHub (or the Releases section),
-then extract the **whole** archive to any folder.
+</details>
 
 ---
 
-## Step 0. Install Nilesoft Shell
+## Что в папке
 
-There is no menu without it. Download it from <https://nilesoft.org/download> and install it like any program,
-or run `winget install Nilesoft.Shell` in a terminal.
+| Что | Зачем |
+|---|---|
+| `Install.cmd` | Автоматическая установка: запусти, и он сделает всё сам |
+| `config/ru`, `config/en` | Сами файлы меню (`shell.nss` и папка `imports`) на русском и на английском |
+| `setup/install.ps1` | Скрипт установки, его запускает `Install.cmd` |
+| `MENU.md`, `MENU.en.md` | Описание всех пунктов меню |
+| `docs/screenshots` | Скриншоты для этого описания |
+| `dev/` | Для тех, кто хочет переделывать меню: генераторы файлов, словарь перевода и проверялка |
 
-Then install the programs you want from the [list below](#required-programs). This is optional:
-without a program you simply do not get its items. If you install one later, run the preset setup again.
+Скачать: зелёная кнопка **Code → Download ZIP** на странице GitHub (или из раздела Releases),
+распаковать архив **целиком** в любую папку.
 
-## Option 1. Automatic setup (easier)
+---
 
-1. Run **`Install.cmd`** and click "Yes" when it asks for administrator rights.
-2. Pick the menu language (the default is your Windows language).
-3. The setup will:
-   - find the Nilesoft Shell folder;
-   - save your current menu to `Nilesoft Shell/backup/before-preset-<date>`;
-   - copy the preset files;
-   - find ffmpeg, Everything and LosslessCut and show what it found. Enter = accept;
-     you can also type the number of another option or paste your own path;
-   - check the ffmpeg version and whether your graphics card can encode video;
-   - tell you which items will appear, which will be hidden and why;
-   - register Nilesoft Shell and restart Explorer (the taskbar blinks, that is normal).
-4. Right-click a file, a folder, the desktop or the taskbar.
+## Шаг 0. Установи Nilesoft Shell
 
-> If Windows says "Windows protected your PC", click "More info" → "Run anyway".
-> Windows does this for any downloaded `.cmd` file. The setup downloads nothing and sends nothing
-> anywhere: it only copies files into the Nilesoft Shell folder and writes program paths there.
+Без него меню не будет. Скачай с <https://nilesoft.org/download> и установи как обычную программу
+или выполни в терминале `winget install Nilesoft.Shell`.
 
-## Option 2. Manual setup
+Потом поставь нужные программы из [списка ниже](#какие-программы-нужны). Это необязательно:
+без программы просто не будет её пунктов. Если поставишь позже, запусти установку пресета ещё раз.
 
-1. Open the Nilesoft Shell folder (usually `C:/Program Files/Nilesoft Shell`). Save its `shell.nss`
-   file and `imports` folder somewhere: that is your current menu.
-2. Copy the contents of **`config/en`** (or `config/ru` for the Russian menu) into the Nilesoft Shell folder:
-   the `shell.nss` file and the `imports` folder, replacing the files. Windows asks for administrator rights, allow it.
-3. If your programs are installed in unusual places, open `imports/paths.nss` in Notepad
-   and put the paths in (see [Does it matter where programs are installed](#does-it-matter-where-programs-are-installed)).
-   If they are installed the usual way, do nothing: the menu finds them itself.
-4. Open a **terminal as administrator** in the Nilesoft Shell folder and run:
+## Способ 1. Автоматическая установка (проще)
+
+1. Запусти **`Install.cmd`** и нажми «Да» на вопрос о правах администратора.
+2. Выбери язык меню (по умолчанию — язык Windows).
+3. Установщик сам:
+   - найдёт папку Nilesoft Shell;
+   - сохранит твоё старое меню в `Nilesoft Shell/backup/before-preset-<дата>`;
+   - скопирует файлы пресета;
+   - найдёт ffmpeg, Everything и LosslessCut и покажет, что нашёл. Enter — согласиться;
+     можно ввести номер другого варианта или вставить свой путь;
+   - проверит версию ffmpeg и то, умеет ли видеокарта кодировать видео;
+   - напишет, какие пункты появятся, а какие будут скрыты и почему;
+   - зарегистрирует Nilesoft Shell и перезапустит Проводник (панель задач моргнёт — это нормально).
+4. Кликни правой кнопкой по файлу, папке, рабочему столу или панели задач.
+
+> Если Windows покажет «Windows защитила ваш компьютер» — нажми «Подробнее» → «Выполнить в любом случае».
+> Так Windows реагирует на любые скачанные `.cmd`. Установщик ничего не скачивает и ничего не отправляет
+> в интернет: он только копирует файлы в папку Nilesoft Shell и пишет в ней пути к программам.
+
+## Способ 2. Ручная установка
+
+1. Открой папку Nilesoft Shell (обычно `C:/Program Files/Nilesoft Shell`). Сохрани куда-нибудь
+   её файл `shell.nss` и папку `imports` — это твоё текущее меню.
+2. Скопируй в папку Nilesoft Shell содержимое **`config/ru`** (или `config/en` для английского меню):
+   файл `shell.nss` и папку `imports`, с заменой файлов. Windows попросит права администратора — соглашайся.
+3. Если программы стоят в необычных местах — открой `imports/paths.nss` Блокнотом
+   и впиши пути (см. [Важно ли, куда установлены программы](#важно-ли-куда-установлены-программы)).
+   Если программы стоят как обычно, ничего делать не нужно: меню найдёт их само.
+4. Открой **терминал от имени администратора** в папке Nilesoft Shell и выполни:
    ```
    shell.exe -register -treat -restart
    ```
-   (`-treat` turns off the short Windows 11 menu, `-restart` restarts Explorer).
-5. If you have Intel graphics (or GPU encoding did not show up), right-click any video →
-   **FFmpeg → Settings → Check graphics card**.
+   (`-treat` отключает урезанное меню Windows 11, `-restart` перезапускает Проводник).
+5. Если есть видеокарта Intel (или кодирование на видеокарте не появилось) — кликни правой кнопкой
+   по любому видео → **FFmpeg → Настройки → Проверить видеокарту**.
 
 ---
 
-## Required programs
+## Какие программы нужны
 
-| Program | For | Required? | Where to get it |
+| Программа | Для чего | Обязательна? | Где взять |
 |---|---|---|---|
-| **Nilesoft Shell** 1.9.18 or newer | The menu itself | **Yes** | <https://nilesoft.org/download> · `winget install Nilesoft.Shell` |
-| **FFmpeg** 7.0 or newer | The "FFmpeg" menu: video, audio, images | No | <https://www.gyan.dev/ffmpeg/builds/> · `winget install Gyan.FFmpeg` |
-| **Everything** | The "Find in Everything" menu | No | <https://www.voidtools.com/> · `winget install voidtools.Everything` |
-| **LosslessCut** | The "Open in LosslessCut" item | No | <https://github.com/mifi/lossless-cut/releases> (Windows archive) |
-| **WinRAR** | The "WinRar" menu (extract and archive) | No | <https://www.win-rar.com/> · `winget install RARLab.WinRAR` |
-| **NVIDIA, AMD or Intel** graphics with a driver | Fast video encoding on the graphics card | No | Your normal graphics driver |
-| VS Code, .NET SDK | The hidden "Develop" menu (Shift + right-click) | No | For programmers only |
+| **Nilesoft Shell** 1.9.18 или новее | Само меню | **Да** | <https://nilesoft.org/download> · `winget install Nilesoft.Shell` |
+| **FFmpeg** 7.0 или новее | Меню «FFmpeg»: видео, звук, картинки | Нет | <https://www.gyan.dev/ffmpeg/builds/> · `winget install Gyan.FFmpeg` |
+| **Everything** | Меню «Найти в Everything» | Нет | <https://www.voidtools.com/> · `winget install voidtools.Everything` |
+| **LosslessCut** | Пункт «Открыть в LosslessCut» | Нет | <https://github.com/mifi/lossless-cut/releases> (архив для Windows) |
+| **WinRAR** | Меню «WinRar» (распаковка и архивация) | Нет | <https://www.win-rar.com/> · `winget install RARLab.WinRAR` |
+| Видеокарта **NVIDIA, AMD или Intel** с драйвером | Быстрое кодирование видео на видеокарте | Нет | Обычный драйвер видеокарты |
+| VS Code, .NET SDK | Скрытое меню «Разработка» (Shift + правый клик) | Нет | Только для программистов |
 
-Already part of Windows, nothing to install: PowerShell 5.1, curl, disk check, ISO mounting.
+Уже есть в Windows и ничего ставить не нужно: PowerShell 5.1, curl, проверка дисков, монтирование ISO.
 
-### Which FFmpeg version
+### Какая версия FFmpeg нужна
 
-- **FFmpeg 7.0 or newer.** Tested with 8.0.1 and 9.0.2. On 6.x and older some items may fail
-  (lossless rotation, for example). The setup warns you if the version is old.
-- You need a build **with x264 and x265** (a GPL build). Both builds from gyan.dev work,
-  `essentials` and `full`: they have everything the menu uses (x264, x265, AV1, WebP, stabilization,
-  GPU encoders). BtbN builds work too, but only the `gpl` variant, not `lgpl`.
-  `winget install Gyan.FFmpeg` installs the full build.
-- Manual way: download `ffmpeg-release-essentials.7z` (or `full`) and extract it anywhere
-  (for example `C:/ffmpeg`). Inside there is a `bin` folder with `ffmpeg.exe`, `ffprobe.exe` and `ffplay.exe`.
+- **FFmpeg 7.0 или новее.** Проверено на 8.0.1 и 9.0.2. На версиях 6.x и старше часть пунктов
+  может не работать (например, поворот без перекодирования). Установщик предупредит, если версия старая.
+- Нужна сборка **с x264 и x265** (так называемая GPL-сборка). Подходят обе сборки с gyan.dev —
+  и `essentials`, и `full`: в них есть всё, что использует меню (x264, x265, AV1, WebP, стабилизация,
+  кодировщики видеокарт). Сборки BtbN тоже подходят, но только вариант `gpl`, не `lgpl`.
+  `winget install Gyan.FFmpeg` ставит полную сборку.
+- Ручной вариант: скачай `ffmpeg-release-essentials.7z` (или `full`), распакуй куда угодно
+  (например, `C:/ffmpeg`). Внутри будет папка `bin` с `ffmpeg.exe`, `ffprobe.exe` и `ffplay.exe`.
 
-### Encoding on the graphics card
+### Кодирование на видеокарте
 
-The menu can encode video on the graphics card, which is many times faster than the CPU:
+Меню умеет кодировать видео на видеокарте — это в разы быстрее процессора:
 
-| Graphics | Technology | Needs |
+| Видеокарта | Технология | Что нужно |
 |---|---|---|
-| NVIDIA GeForce GTX 900 and newer | NVENC | A recent NVIDIA driver |
-| AMD Radeon RX 400 and newer, Ryzen CPUs with integrated graphics | AMF | AMD Adrenalin driver |
-| Intel integrated graphics (6th gen Core and newer), Intel Arc | Quick Sync | Intel driver |
+| NVIDIA GeForce GTX 900 и новее | NVENC | Свежий драйвер NVIDIA |
+| AMD Radeon RX 400 и новее, процессоры Ryzen со встроенной графикой | AMF | Драйвер AMD Adrenalin |
+| Intel: встроенная графика (Core 6-го поколения и новее), Intel Arc | Quick Sync | Драйвер Intel |
 
-The card is detected automatically: the menu tries to encode half a second of test video and remembers
-what worked. Not every older card can do H.265; then the CPU handles H.265.
-Without a suitable card the "on the graphics card" items are hidden and the CPU does everything
-(slower, but even better quality per megabyte).
+Видеокарта определяется сама: меню пробует закодировать полсекунды тестового видео и запоминает,
+что сработало. H.265 умеют не все старые видеокарты — тогда для H.265 используется процессор.
+Если видеокарты нет или она не умеет кодировать, пункты «на видеокарте» скрыты и всё делает процессор
+(медленнее, но качество на мегабайт даже лучше).
 
-Turn it on in the menu: **FFmpeg → Settings → Encode video on the graphics card**.
-After changing the card or the driver: **FFmpeg → Settings → Check graphics card**.
+Включается в меню: **FFmpeg → Настройки → Кодировать видео на видеокарте**.
+После замены видеокарты или драйвера: **FFmpeg → Настройки → Проверить видеокарту**.
 
-> To be honest: NVIDIA encoding is tested on a real card. For AMD and Intel the settings were checked
-> against the documentation and ffmpeg itself, but the preset has not been run on real AMD or Intel graphics yet.
-> If something is wrong, turn GPU encoding off and report it in Issues.
+> Честно: кодирование на NVIDIA проверено на реальной видеокарте. Для AMD и Intel параметры
+> проверены по документации и самим ffmpeg, но на настоящих видеокартах AMD и Intel пресет ещё не запускался.
+> Если что-то не так — выключи кодирование на видеокарте и напиши об ошибке в Issues.
 
-**About Everything.** The regular installer version is best: it installs a service and sees all drives.
-The portable version needs administrator rights to index drives (turn on "Run as administrator"
-in its settings or install the Everything service).
+**Про Everything.** Лучше обычная установочная версия: она ставит службу и сразу видит все диски.
+Портативной версии для индексации дисков нужны права администратора (в её настройках включи
+«Запускать от имени администратора» или установи службу Everything).
 
-**About WinRAR.** If you use 7-Zip or another archiver, no problem: the WinRar menu just does not
-appear, and your archiver keeps its own items.
+**Про WinRAR.** Если у тебя 7-Zip или другой архиватор — ничего страшного: меню WinRar просто
+не появится, а пункты твоего архиватора останутся как были.
 
 ---
 
-## Does it matter where programs are installed?
+## Важно ли, куда установлены программы?
 
-**No.** Programs are found automatically:
+**Нет.** Программы ищутся автоматически:
 
-1. The setup looks everywhere: in PATH, among installed and running programs and in folders
-   with a similar name on all drives (for example `D:/Soft/ffmpeg-9.0/bin`). The paths it finds are
-   written to `imports/paths.nss` in the Nilesoft Shell folder.
-2. Even without the setup the menu checks the usual places itself: `Program Files`, winget, scoop
-   and chocolatey folders, `C:/ffmpeg/bin`.
+1. Установщик ищет их везде: в PATH, среди установленных программ, среди запущенных
+   и в папках с похожим названием на всех дисках (например, `D:/Soft/ffmpeg-9.0/bin`). Найденные пути
+   записываются в файл `imports/paths.nss` в папке Nilesoft Shell.
+2. Даже без установщика меню само проверяет обычные места: `Program Files`, папки winget, scoop
+   и chocolatey, `C:/ffmpeg/bin`.
 
-If you **moved a program** to another folder, run `Install.cmd` again or open
-`imports/paths.nss` in the Nilesoft Shell folder and put the path into the top lines:
+Если ты **перенёс программу** в другую папку — запусти `Install.cmd` ещё раз или открой
+`imports/paths.nss` в папке Nilesoft Shell и впиши путь в верхние строки:
 
 ```
-$ff_bin_user = 'D:\Soft\FFmpeg\bin'                    // folder that contains ffmpeg.exe
+$ff_bin_user = 'D:\Soft\FFmpeg\bin'                    // папка, где лежит ffmpeg.exe
 $ev_exe_user = 'C:\Program Files\Everything\Everything.exe'
 $lc_exe_user = 'D:\Soft\LosslessCut\LosslessCut.exe'
 ```
 
-Empty quotes `''` mean "find it yourself". The only limitation: the path must not contain an apostrophe `'`.
+Пустые кавычки `''` значат «искать самому». Единственное ограничение: в пути не должно быть апострофа `'`.
 
-## Do I need to add anything to PATH?
+## Нужно ли что-то добавлять в PATH?
 
-**No.** The menu starts programs by their full path and does not need PATH.
-Add FFmpeg to PATH only if you want to type `ffmpeg` in a terminal yourself:
-Settings → System → About → Advanced system settings → Environment Variables →
-`Path` → New → the path to the `bin` folder. Installing with winget adds it to PATH for you.
-For the "Develop" menu the `code` command must work in a terminal; the VS Code installer sets that up.
+**Нет.** Меню запускает программы по полному пути, PATH ему не нужен.
+Добавлять FFmpeg в PATH стоит, только если хочешь сам набирать `ffmpeg` в терминале:
+«Параметры» → «Система» → «О системе» → «Дополнительные параметры системы» → «Переменные среды» →
+`Path` → «Создать» → путь к папке `bin`. Установка через winget добавляет его в PATH сама.
+Для меню «Разработка» команда `code` должна работать в терминале — установщик VS Code добавляет её сам.
 
 ---
 
-## What happens if a program is missing
+## Что будет, если какой-то программы нет
 
-Nothing breaks: that program's items are simply **not shown**.
+Ничего не сломается: пункты этой программы просто **не показываются**.
 
-| Missing | In the menu |
+| Нет программы | Что в меню |
 |---|---|
-| FFmpeg | No "FFmpeg" menu. Everything else works |
-| Everything | No "Find in Everything" menu |
-| LosslessCut | No "Open in LosslessCut" item |
-| WinRAR | No "WinRar" menu |
-| A graphics card that can encode video | No "on the graphics card" items and no GPU setting in the FFmpeg menu. The CPU encodes everything |
-| VS Code / .NET | Items in the hidden "Develop" menu will not work (the menu itself only shows with Shift) |
-| Hibernation turned off in Windows | No "Hibernate" item in the "Power" menu |
+| FFmpeg | Нет меню «FFmpeg». Всё остальное работает |
+| Everything | Нет меню «Найти в Everything» |
+| LosslessCut | Нет пункта «Открыть в LosslessCut» |
+| WinRAR | Нет меню «WinRar» |
+| Видеокарты, умеющей кодировать видео | В меню FFmpeg нет пунктов «на видеокарте» и настройки кодирования на видеокарте. Всё кодирует процессор |
+| VS Code / .NET | Пункты в скрытом меню «Разработка» не сработают (само меню видно только с Shift) |
+| Гибернация выключена в Windows | В меню «Питание» нет пункта «Гибернация» |
 
-Rules for other programs (Win 10 Tweaker, VLC, MPC-HC, AIMP, Git, VS Code, Adobe Acrobat, NVIDIA)
-gather their items into the "Programs" and "Access" submenus. Without those programs the rules find nothing,
-and empty submenus are not shown.
-
----
-
-## Troubleshooting
-
-- **The menu did not change.** Restart Explorer or the computer. If that does not help, open a terminal
-  as administrator in the Nilesoft Shell folder and run `shell.exe -register -treat -restart`.
-- **All items are gone or the menu looks odd.** Nilesoft writes errors to `shell.log` in its folder.
-  Usually it is a typo after editing a `.nss` file by hand. Restore the file from `backup` or run the setup again.
-- **The FFmpeg window closed with an error.** FFmpeg → Settings → turn on "Always wait for Enter at the end",
-  repeat and read the error message.
-- **An error when encoding on the graphics card.** Turn off "FFmpeg → Settings → Encode video on the graphics card"
-  and update the graphics driver. Then "Check graphics card" again.
-- **The antivirus complains about scripts.** Menu items start the PowerShell scripts `ffmpeg-run.ps1` and
-  `tools-run.ps1` from the `imports` folder. They are plain text files you can open and read.
-- **Windows in another language.** Everything works, but a couple of system items may stay where they are:
-  the rules that move them know the English and Russian names of system items.
-- **Windows 10.** It should work, but the preset was only tested on Windows 11. Windows 10 does not have
-  the theme font (Segoe UI Variable), so the menu uses the standard font.
-
-## Uninstall
-
-- Get your old menu back: copy `shell.nss` and `imports` from `Nilesoft Shell/backup/before-preset-<date>`
-  back into the Nilesoft Shell folder and restart Explorer.
-- Remove Nilesoft Shell completely: uninstall it in Settings → Apps (or in a terminal as
-  administrator: `shell.exe -unregister -restart`, then delete the folder).
-- FFmpeg menu settings live in the registry: `HKEY_CURRENT_USER/Software/Nilesoft-FFmpeg-menu`
-  (you can delete that key). The rename undo file: `%LOCALAPPDATA%/Nilesoft-tools-rename-undo.json`.
+Правила для чужих программ (Win 10 Tweaker, VLC, MPC-HC, AIMP, Git, VS Code, Adobe Acrobat, NVIDIA)
+собирают их пункты в подменю «Программы» и «Доступ». Если этих программ нет, правила ничего не находят,
+а пустые подменю не показываются.
 
 ---
 
-## Make it yours
+## Если что-то пошло не так
 
-The menu is described by `.nss` text files (open them in Notepad or VS Code). Everything about the
-configuration language, themes and icons is in the Nilesoft Shell documentation:
+- **Меню не изменилось.** Перезапусти Проводник или компьютер. Если не помогло — открой терминал
+  от имени администратора в папке Nilesoft Shell и выполни `shell.exe -register -treat -restart`.
+- **Пропали все пункты или меню выглядит странно.** Nilesoft пишет ошибки в файл `shell.log` в своей папке.
+  Чаще всего это опечатка после ручной правки `.nss`. Верни файл из `backup` или запусти установщик заново.
+- **Окно FFmpeg закрылось с ошибкой.** FFmpeg → Настройки → включи «Всегда ждать Enter в конце»,
+  повтори и прочитай текст ошибки.
+- **Ошибка при кодировании на видеокарте.** Выключи «FFmpeg → Настройки → Кодировать видео на видеокарте»
+  и обнови драйвер видеокарты. Потом можно «Проверить видеокарту» ещё раз.
+- **Антивирус ругается на скрипты.** Пункты меню запускают PowerShell-скрипты `ffmpeg-run.ps1` и
+  `tools-run.ps1` из папки `imports` — это обычные текстовые файлы, их можно открыть и прочитать.
+- **Windows на другом языке.** Всё работает, но пара системных пунктов может остаться на своих местах:
+  правила перемещения знают русские и английские названия системных пунктов.
+- **Windows 10.** Должно работать, но пресет проверялся только на Windows 11. Шрифта темы
+  (Segoe UI Variable) в Windows 10 нет, поэтому меню будет со стандартным шрифтом.
 
-- Documentation: <https://nilesoft.org/docs>
-- Icons (glyphs) for menu items: <https://nilesoft.org/glyphs>
-- Nilesoft Shell source code: <https://github.com/moudey/Shell>
-- Nilesoft Shell community on Discord (themes and ready-made snippets): <https://discord.gg/Mg3tum2sd8>
-- A large library of ready-made snippets: <https://github.com/RubicBG/Nilesoft-Shell-Snippets>
+## Как удалить
 
-A few quick tips:
+- Вернуть своё старое меню: скопируй `shell.nss` и `imports` из `Nilesoft Shell/backup/before-preset-<дата>`
+  обратно в папку Nilesoft Shell и перезапусти Проводник.
+- Убрать Nilesoft Shell совсем: удали его через «Параметры» → «Приложения» (или в терминале от имени
+  администратора: `shell.exe -unregister -restart`, потом удали папку).
+- Настройки меню FFmpeg хранятся в реестре: `HKEY_CURRENT_USER/Software/Nilesoft-FFmpeg-menu`
+  (этот раздел можно удалить). Файл отмены переименования: `%LOCALAPPDATA%/Nilesoft-tools-rename-undo.json`.
 
-- **Transparency and colors**: `imports/theme.nss` (`opacity`: lower = more transparent).
-- **Program paths**: `imports/paths.nss`.
-- **Remove a whole menu**: in `shell.nss` put `//` in front of its `import 'imports/...'` line.
-- After an edit, save the file and restart Explorer (or the computer). Make a copy of the file before editing.
-  If the menu disappears, look at `shell.log` in the Nilesoft Shell folder: it says which line is wrong.
+---
 
-## Credits and licenses
+## Настроить под себя
 
-- This preset: MIT license, see [LICENSE](LICENSE).
-- Nilesoft Shell and its default menu files (`images.nss`, the base of `goto`, `terminal`, `file-manage`, `taskbar`, `develop`, `modify`): © Moudey, MIT license.
-- The WinRAR menu is based on a RubicBG snippet (CC0); the tools are rewritten after his library.
+Меню описывается текстовыми файлами `.nss` (открываются Блокнотом или VS Code). Подробно про язык
+настроек, темы и иконки — в документации Nilesoft Shell:
+
+- Документация: <https://nilesoft.org/docs>
+- Иконки (глифы) для пунктов меню: <https://nilesoft.org/glyphs>
+- Исходники Nilesoft Shell: <https://github.com/moudey/Shell>
+- Сообщество Nilesoft Shell в Discord (там делятся темами и готовыми сниппетами): <https://discord.gg/Mg3tum2sd8>
+- Большая библиотека готовых сниппетов: <https://github.com/RubicBG/Nilesoft-Shell-Snippets>
+
+Пара быстрых подсказок:
+
+- **Прозрачность и цвета** — `imports/theme.nss` (`opacity`: меньше — прозрачнее).
+- **Пути к программам** — `imports/paths.nss`.
+- **Убрать целое меню** — в `shell.nss` поставь `//` перед строкой `import 'imports/...'`.
+- После правки сохрани файл и перезапусти Проводник (или компьютер). Перед правками сделай копию файла.
+  Если меню пропало — смотри `shell.log` в папке Nilesoft Shell: там написано, в какой строке ошибка.
+
+## Авторы и лицензии
+
+- Этот пресет — лицензия MIT, см. [LICENSE](LICENSE).
+- Nilesoft Shell и его стандартные файлы меню (`images.nss`, основа `goto`, `terminal`, `file-manage`, `taskbar`, `develop`, `modify`) — © Moudey, лицензия MIT.
+- Меню WinRAR основано на сниппете RubicBG (CC0), инструменты переписаны по мотивам его библиотеки.

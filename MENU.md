@@ -1,127 +1,128 @@
-**English** | [Русский](MENU.ru.md)
+[English](MENU.en.md) | **Русский**
 
-# What is in the menu
+# Что есть в меню
 
-Items appear only where they make sense: the FFmpeg menu only on video, audio and images,
-"Power" only on the desktop and the taskbar, and so on. Almost every item has a tooltip:
-hover over it for a second.
+Пункты появляются только там, где имеют смысл: например, меню FFmpeg — только на видео, звуке
+и картинках, «Питание» — на рабочем столе и панели задач. Почти у всех пунктов есть подсказка:
+наведи мышь и подожди секунду.
 
-How to make the menu yours: [README.md](README.md#make-it-yours).
+Как настроить меню под себя — в [README.md](README.md#настроить-под-себя).
 
 ---
 
-## Files and folders
+## Файлы и папки
 
 ### FFmpeg
-*(needs FFmpeg; on video, audio and images; works on several selected files at once)*
+*(нужен FFmpeg; на видео, звуке и картинках; можно выделить сразу несколько файлов)*
 
-Processing opens in a window with a progress bar, time left and the load on the CPU,
-memory and graphics card. **Esc** or **Q** cancels: the unfinished file is deleted, the source is untouched.
+Обработка открывается в окне с полосой прогресса, временем до конца и нагрузкой на процессор,
+память и видеокарту. **Esc** или **Q** — отменить: недоделанный файл удаляется, исходник не трогается.
 
-- **Mode: copy / replace** (the first item, click to switch).
-  *Copy* saves the result next to the source under a new name. *Replace* gives the result the source name
-  and moves the source to the Recycle Bin (it is not deleted for good). New files (GIF, audio from a video,
-  frames) are always created separately.
-- **Settings**: save copies to the "FFmpeg" subfolder; encode video on the graphics card (NVIDIA, AMD
-  or Intel, shown only if your card can do it); always wait for Enter at the end; beep when done;
-  show the result in Explorer; **check graphics card** (after changing the card or the driver).
+- **Режим: копия / замена** (первый пункт, переключается кликом).
+  *Копия* — результат кладётся рядом под новым именем. *Замена* — результат получает имя исходника,
+  а исходник уходит в Корзину (не удаляется насовсем). Новые файлы (GIF, звук из видео, кадры)
+  всегда создаются отдельно.
+- **Настройки**: сохранять копии в подпапку «FFmpeg»; кодировать видео на видеокарте (NVIDIA, AMD
+  или Intel — есть, только если видеокарта умеет); всегда ждать Enter в конце; звук по окончании;
+  показать результат в Проводнике; **проверить видеокарту** (после замены видеокарты или драйвера).
 
-**Video**
-- **To MP4 without quality loss**: for files that Telegram and phones do not accept as video.
-  "Automatic" copies a suitable video without re-encoding and re-encodes the rest almost losslessly.
-  You can also choose H.264 / H.265 on the CPU or on the graphics card.
-- **Compress**: H.264 (plays everywhere), H.265 (smaller but slower), on the graphics card (fast).
-- **Fit into a size limit**: guaranteed to fit: Discord 20 MB / 10 MB, Catbox 200 MB
-  or a custom size. Resolution and frame rate are picked for the video length.
-  Options: balanced, smooth (60 fps), sharp (30 fps), H.265.
-- **Downscale** to 1080p / 720p / 480p.
-- **Trim**: fast without re-encoding (at keyframes) or exact; asks for start and end.
-- **Speed**, **frame rate**, **rotate / flip** (including instant rotation without re-encoding).
-- **Enhance**: stabilization, denoise, sharpen, remove black bars, deinterlace,
-  smooth 60 fps by frame interpolation.
-- **Remux** to MP4 / MKV without re-encoding.
-- **Join the selected**, **split into parts** of N minutes, **strip metadata** (GPS, camera, dates).
-- **Subtitles**: extract, add the `.srt` file next to the video, or burn into the picture.
-- **Audio**: extract to MP3 / M4A / AAC / OPUS / OGG / FLAC / WAV / AIFF or as is; remove audio;
-  pick a track; clean up voice noise; louder / quieter; normalize loudness.
-- **Make from video**: GIF (three sizes), vertical 9:16 for Shorts / TikTok / Reels,
-  frame from the middle, 4×4 thumbnail grid, reverse, frames every N seconds, teaser.
+**Видео**
+- **В MP4 без потери качества** — для файлов, которые Telegram и телефоны не принимают как видео.
+  «Автоматически» копирует подходящее видео без перекодирования, остальное пережимает почти без потерь.
+  Можно выбрать H.264 / H.265 на процессоре или на видеокарте.
+- **Сжать** — H.264 (открывается везде), H.265 (меньше, но дольше), на видеокарте (быстро).
+- **Ужать под лимит** — гарантированно уложиться в размер: Discord 20 МБ / 10 МБ, Catbox 200 МБ
+  или свой размер. Разрешение и частота кадров подбираются по длине видео.
+  Варианты: баланс, плавность (60 fps), чёткость (30 fps), H.265.
+- **Уменьшить** до 1080p / 720p / 480p.
+- **Обрезать** — быстро без перекодирования (по ключевым кадрам) или точно; спросит начало и конец.
+- **Скорость**, **частота кадров**, **повернуть / отразить** (есть поворот мгновенно, без перекодирования).
+- **Улучшить** — стабилизация тряски, шумоподавление, резкость, обрезка чёрных полос,
+  устранение «гребёнки», плавность 60 fps дорисовкой кадров.
+- **Перепаковать** в MP4 / MKV без перекодирования.
+- **Склеить выбранные**, **разрезать на части** по N минут, **удалить метаданные** (GPS, камера, даты).
+- **Субтитры** — извлечь, добавить файл `.srt`, лежащий рядом, или вшить в картинку.
+- **Звук** — извлечь в MP3 / M4A / AAC / OPUS / OGG / FLAC / WAV / AIFF или как есть; убрать звук;
+  выбрать дорожку; убрать шум из голоса; громче / тише; выровнять громкость.
+- **Создать из видео** — GIF (три размера), вертикальное 9:16 для Shorts / TikTok / Reels,
+  кадр из середины, превью-сетка 4×4, видео задом наперёд, кадры каждые N секунд, нарезка-превью.
 
-**Audio**: convert to MP3 / M4A / OPUS / OGG / FLAC / WAV / AIFF, louder / quieter, normalize loudness,
-trim silence at both ends, trim, speed, join, split, clean up noise, make a video
-(with the cover or a waveform), spectrogram, strip metadata.
+**Звук** — конвертировать в MP3 / M4A / OPUS / OGG / FLAC / WAV / AIFF, громче / тише, выровнять громкость,
+убрать тишину по краям, обрезать, скорость, склеить, разрезать, убрать шум, сделать видео
+(с обложкой или волной), спектрограмма, удалить метаданные.
 
-**Images**: convert to JPG / PNG / WebP / AVIF / ICO, compress for websites, upscale ×2–×10,
-downscale, rotate / flip, black and white, slideshow from the selected images.
+**Картинки** — конвертировать в JPG / PNG / WebP / AVIF / ICO, сжать для сайтов, увеличить ×2–×10,
+уменьшить, повернуть / отразить, чёрно-белое, слайд-шоу из выбранных картинок.
 
-**More**: "Video + music" (select one video and one audio file to replace the audio or add background music),
-check a file for broken parts, file info, play in ffplay, FFmpeg version (hold Shift).
+**Ещё**: «Видео + музыка» (выдели одно видео и один аудиофайл — заменить звук или добавить фоном),
+проверить файл на битые места, сведения о файле, воспроизвести в ffplay,
+версия FFmpeg (с зажатым Shift).
 
-### Tools
-- **Hash (checksum)**: show MD5 / SHA-1 / SHA-256, copy, verify against a hash from the clipboard,
-  compare two files, create and verify a checksum file.
-- **Rename** (many files at once): letter case, spaces and underscores, dots → spaces,
-  add a prefix / suffix, find and replace, number, change extension.
-  It shows a preview first and asks for confirmation. There is **undo last rename**.
-- **Share as a link**: upload a file to temp.sh (up to 4 GB, 3 days) or uguu.se (up to 128 MB, 3 hours),
-  the link is copied to the clipboard. **Warning:** anyone with the link can download the file.
-  Do not upload anything private.
-- **Disk image** (on `.iso` and `.img`): mount and open / unmount.
+### Инструменты
+- **Хэш (контрольная сумма)** — показать MD5 / SHA-1 / SHA-256, скопировать, сверить с хэшем из буфера
+  обмена, сравнить два файла, создать и проверить файл контрольных сумм.
+- **Переименовать** (сразу много файлов) — регистр букв, пробелы и подчёркивания, точки → пробелы,
+  добавить текст в начало / конец, найти и заменить, пронумеровать, сменить расширение.
+  Сначала показывает, что получится, и спрашивает подтверждение. Есть **отмена последнего переименования**.
+- **Поделиться ссылкой** — загрузить файл на temp.sh (до 4 ГБ, 3 дня) или uguu.se (до 128 МБ, 3 часа),
+  ссылка копируется в буфер обмена. **Внимание:** файл будет доступен любому, у кого есть ссылка.
+  Не загружай личное.
+- **Образ диска** (на `.iso` и `.img`) — подключить и открыть / отключить.
 
-### Find in Everything
-*(needs Everything)*: instant search in this folder, on the whole drive, only video / images / music /
-documents / archives / programs / folders, large files, modified today or this week,
-files with the same extension or the same name (finding copies).
+### Найти в Everything
+*(нужен Everything)* — мгновенный поиск: в этой папке, по всему диску, только видео / картинки / музыка /
+документы / архивы / программы / папки, большие файлы, изменённые сегодня или за неделю,
+файлы с таким же расширением или с таким же именем (поиск копий).
 
-### File manage
-- **Copy path**: full path, folder, name, name without extension, extension; paths of several files at once.
-- **Change extension**.
-- **Select**: all, invert, none; **smart select** in the current folder: by type (video, images,
-  music, documents, archives, folders only, files only), by size, by date, same extension,
-  by mask (for example `*2024*.jpg`).
-- **Take ownership**, **show / hide** system files and extensions,
-  **attributes** (hidden, system, read-only), **register DLL**.
-- **New folder** with the date or a random name, **new file** (TXT, XML, JSON, HTML).
+### Управление файлами
+- **Копировать путь** — полный путь, папку, имя, имя без расширения, расширение; пути нескольких файлов сразу.
+- **Изменить расширение**.
+- **Выделить** — всё, обратить, снять; **умное выделение** в текущей папке: по типу (видео, картинки,
+  музыка, документы, архивы, только папки, только файлы), по размеру, по дате, с таким же расширением,
+  по маске (например, `*2024*.jpg`).
+- **Получить права владельца**, **показать / скрыть** системные файлы и расширения,
+  **атрибуты** (скрытый, системный, только чтение), **регистрация DLL**.
+- **Новая папка** с датой или случайным именем, **новый файл** (TXT, XML, JSON, HTML).
 
-### Open in LosslessCut
-*(needs LosslessCut; on video and audio)*: fast trimming without re-encoding in a separate program.
+### Открыть в LosslessCut
+*(нужен LosslessCut; на видео и звуке)* — быстрая обрезка без перекодирования в отдельной программе.
 
 ### WinRar
-*(needs WinRAR)*: extract here / to a folder / each archive to its own folder (with Shift, also delete the archive),
-add to an archive, convert, test, repair archives.
+*(нужен WinRAR)* — распаковать сюда / в папку / каждый архив в свою папку (с Shift — и удалить архив),
+добавить в архив, конвертировать, проверить, восстановить архив.
 
-### Terminal
-Command Prompt, PowerShell or Windows Terminal in the current folder.
-Hold **Shift** to run as administrator.
+### Терминал
+Командная строка, PowerShell или Windows Terminal в текущей папке.
+С зажатым **Shift** — от имени администратора.
 
-### Go to
-Quick access to system folders (Windows, Program Files, AppData, Downloads, Temp…), Control Panel
-and Settings pages.
+### Перейти
+Быстрый переход к системным папкам (Windows, Program Files, AppData, Загрузки, Temp…), панели управления
+и разделам «Параметров».
 
-### Submenus that collect other items
-- **Pin/Unpin**: the "Pin to Start / taskbar" items.
-- **More options** (a standard Nilesoft submenu, its name follows the Windows language): rarely used system
-  items like Send to, Share, Create shortcut, Print.
-- **Programs**: items of Git, VS Code, Compress Folder, Adobe Acrobat and media players (on folders).
-- **Access**: Win 10 Tweaker items about ownership and internet access.
+### Подменю, куда собраны чужие пункты
+- **Закрепить/открепить** — пункты «Закрепить на начальном экране / панели задач».
+- **Дополнительные параметры** (стандартное подменю Nilesoft, название зависит от языка) — редкие системные
+  пункты: Отправить, Поделиться, Создать ярлык, Печать и т. п.
+- **Программы** — пункты Git, VS Code, Compress Folder, Adobe Acrobat и плееров (на папках).
+- **Доступ** — пункты Win 10 Tweaker про права и доступ в интернет.
 
-Without those programs these submenus simply do not appear.
+Если таких программ нет, подменю просто не появляются.
 
-### Develop
-*(only with Shift held)*: open in VS Code or Notepad, `dotnet` commands (run, build, publish…).
+### Разработка
+*(только с зажатым Shift)* — открыть в VS Code или Блокноте, команды `dotnet` (run, build, publish…).
 
 ---
 
-## Drives
-- **Drive maintenance**: Disk Cleanup, optimize (defragment / TRIM), check for errors,
-  Disk Management.
-- **Eject mounted image**: on a virtual drive with an ISO.
+## Диски
+- **Обслуживание диска** — очистка, оптимизация (дефрагментация / TRIM), проверка на ошибки,
+  управление дисками.
+- **Извлечь подключённый образ** — на виртуальном приводе с ISO.
 
-## Desktop and taskbar
-- **Power**: lock, sleep, hibernate (if enabled in Windows), restart, shut down,
-  shut down on a timer (15 minutes to 3 hours, can be cancelled), restart to BIOS/UEFI,
-  advanced startup, sign out. Everything that turns the computer off
-  asks for confirmation first ("No" is the default).
-- **Taskbar**: apps (Paint, Edge, Calculator, Registry Editor), window arrangement,
-  desktop, settings, Task Manager.
-  With Shift: the Nilesoft Shell menu itself: configuration, program folder, documentation.
+## Рабочий стол и панель задач
+- **Питание** — заблокировать, сон, гибернация (если включена в Windows), перезагрузка, выключение,
+  выключение по таймеру (15 минут – 3 часа, можно отменить), перезагрузка в BIOS/UEFI,
+  особые варианты загрузки, выход из учётной записи. Всё, что выключает компьютер,
+  сначала спрашивает подтверждение (по умолчанию выбрано «Нет»).
+- **Панель задач** — приложения (Paint, Edge, калькулятор, редактор реестра), расположение окон,
+  рабочий стол, параметры, диспетчер задач.
+  С Shift — меню самого Nilesoft Shell: конфигурация, папка программы, документация.
