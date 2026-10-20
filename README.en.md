@@ -43,6 +43,7 @@ Screenshots show the Russian menu; the English one has the same items.
 | `config/en`, `config/ru` | The menu itself (`shell.nss` and the `imports` folder) in English and Russian |
 | `setup/install.ps1` | The setup script that `Install.cmd` starts |
 | `MENU.en.md`, `MENU.md` | Description of every menu item |
+| `CHANGELOG.en.md`, `CHANGELOG.md` | Changelog by version |
 | `docs/screenshots` | Screenshots for this page |
 | `dev/` | For those who want to change the menu: file generators, the translation dictionary and a checker |
 
