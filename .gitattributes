@@ -5,3 +5,4 @@
 *.tmpl text eol=crlf
 # .nss are Nilesoft Shell configs, not NWScript: keep them out of the language bar
 *.nss linguist-detectable=false
+*.tmpl linguist-detectable=false
