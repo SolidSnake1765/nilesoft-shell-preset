@@ -183,21 +183,59 @@ function Select-Program([string]$Name, [string]$Why, [string[]]$Found, [scriptbl
 # ---------- 1. Nilesoft Shell folder ----------
 function Test-Nilesoft([string]$dir) { return ($dir -and (Test-Path -LiteralPath (Join-Path $dir 'shell.exe') -PathType Leaf)) }
 
-if (-not $Target) {
+# Every Nilesoft Shell folder on this PC, installed and portable alike; the most reliable places go first
+function Find-NilesoftDirs {
     $cands = @()
+    # A registered Nilesoft (installed or portable) leaves the full path of its shell.dll in the registry
+    foreach ($hive in 'HKLM:', 'HKCU:') {
+        foreach ($n in 1..3) {
+            $dll = (Get-ItemProperty -Path "$hive/SOFTWARE/Classes/CLSID/{BAE3934B-8A6A-4BFB-81BD-3FC599A1BAF$n}/InprocServer32" -ErrorAction SilentlyContinue).'(default)'
+            if ($dll) { $cands += Split-Path $dll }
+        }
+    }
+    # The shell.dll Explorer has loaded right now
+    try {
+        foreach ($m in @((Get-Process explorer -ErrorAction SilentlyContinue).Modules)) {
+            if ($m.ModuleName -eq 'shell.dll') { $cands += Split-Path $m.FileName }
+        }
+    } catch { }
     foreach ($u in (Get-UninstallEntries | Where-Object { $_.DisplayName -like 'Nilesoft Shell*' })) {
         if ($u.InstallLocation) { $cands += $u.InstallLocation }
         if ($u.DisplayIcon) { $cands += Split-Path (($u.DisplayIcon -replace ',\s*-?\d+$', '').Trim('"', ' ')) }
     }
     $cands += Join-Path $env:ProgramFiles 'Nilesoft Shell'
-    $Target = $cands | Where-Object { Test-Nilesoft $_ } | Select-Object -First 1
+    $cands += Join-Path $env:USERPROFILE 'scoop/apps/nilesoft-shell/current'   # scoop install nilesoft-shell
+    # A portable copy that is not registered yet: folders named like Nilesoft on all drives
+    $cands += @(Find-Program -Exe 'shell.exe' -Like '*nilesoft*' -Known @() | ForEach-Object { Split-Path $_ })
+
+    $seen = @{}
+    $found = @()
+    foreach ($c in $cands) {
+        if (-not (Test-Nilesoft $c) -or -not (Test-Path -LiteralPath (Join-Path $c 'shell.dll'))) { continue }
+        $full = (Resolve-Path -LiteralPath $c).Path.TrimEnd([char]92)
+        if ($seen.ContainsKey($full.ToLowerInvariant())) { continue }
+        $seen[$full.ToLowerInvariant()] = $true
+        $found += $full
+    }
+    return $found
+}
+
+if (-not $Target) {
+    $found = @(Find-NilesoftDirs)
+    if ($found.Count -eq 1) { $Target = $found[0] }
+    elseif ($found.Count -gt 1) {
+        $Target = Select-Program 'Nilesoft Shell' (T 'куда поставить меню' 'where to put the menu') $found `
+            { param($p) if (Test-Nilesoft $p) { return (Resolve-Path -LiteralPath $p).Path }; return '' } ''
+    }
 }
 if (-not (Test-Nilesoft $Target)) {
     Say ''
     Say (T 'Не нашёл Nilesoft Shell.' 'Nilesoft Shell was not found.') Yellow
-    Say (T 'Сначала установи его: https://nilesoft.org/download (или командой: winget install Nilesoft.Shell),' `
-           'Install it first: https://nilesoft.org/download (or run: winget install Nilesoft.Shell),')
-    Say (T 'потом запусти Install.cmd ещё раз.' 'then run Install.cmd again.')
+    Say (T 'Сначала поставь его: https://nilesoft.org/download — установщик, winget install Nilesoft.Shell' `
+           'Get it first: https://nilesoft.org/download - the installer, winget install Nilesoft.Shell')
+    Say (T 'или портативную версию (архив): распакуй в любую папку, регистрацию сделает этот установщик.' `
+           'or the portable version (archive): extract it to any folder, this setup will register it.')
+    Say (T 'Потом запусти Install.cmd ещё раз.' 'Then run Install.cmd again.')
     if (-not $Yes) {
         $a = (Read-Host (T 'Или вставь путь к папке, где лежит shell.exe (Enter — выйти)' 'Or paste the folder that contains shell.exe (Enter = exit)')).Trim().Trim('"')
         if (Test-Nilesoft $a) { $Target = $a }

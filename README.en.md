@@ -53,8 +53,11 @@ then extract the **whole** archive to any folder.
 
 ## Step 0. Install Nilesoft Shell
 
-There is no menu without it. Download it from <https://nilesoft.org/download> and install it like any program,
-or run `winget install Nilesoft.Shell` in a terminal.
+There is no menu without it. <https://nilesoft.org/download> has two options, both work:
+
+- **Portable version** (`portable.zip`): just extract it to any folder, for example `D:/APPS/Nilesoft Shell`.
+  Nothing gets installed; the preset setup registers it in Windows. More in [Portability](#portability).
+- **Regular install**: `setup-x64.msi`, or `winget install Nilesoft.Shell`, or `scoop install nilesoft-shell`.
 
 Then install the programs you want from the [list below](#required-programs). This is optional:
 without a program you simply do not get its items. If you install one later, run the preset setup again.
@@ -80,7 +83,7 @@ without a program you simply do not get its items. If you install one later, run
 
 ## Option 2. Manual setup
 
-1. Open the Nilesoft Shell folder (usually `C:/Program Files/Nilesoft Shell`). Save its `shell.nss`
+1. Open the Nilesoft Shell folder (the one with `shell.exe`: usually `C:/Program Files/Nilesoft Shell`, for the portable one wherever you extracted it). Save its `shell.nss`
    file and `imports` folder somewhere: that is your current menu.
 2. Copy the contents of **`config/en`** (or `config/ru` for the Russian menu) into the Nilesoft Shell folder:
    the `shell.nss` file and the `imports` folder, replacing the files. Windows asks for administrator rights, allow it.
@@ -181,6 +184,29 @@ Add FFmpeg to PATH only if you want to type `ffmpeg` in a terminal yourself:
 Settings → System → About → Advanced system settings → Environment Variables →
 `Path` → New → the path to the `bin` folder. Installing with winget adds it to PATH for you.
 For the "Develop" menu the `code` command must work in a terminal; the VS Code installer sets that up.
+
+## Portability
+
+The preset is built with portable programs in mind: **nothing has to be installed into the system**.
+
+- **Nilesoft Shell** can be portable (`portable.zip` from <https://nilesoft.org/download>), in any folder
+  on any drive. The preset setup finds it itself:
+  - if it is already registered, by its registry entry (it holds the full path to its `shell.dll`);
+  - if not yet, by a folder with "Nilesoft" in its name, up to two levels from a drive root
+    (for example `D:/APPS/Nilesoft Shell`), or in Downloads, Desktop or Documents;
+  - if nothing is found, it asks you to paste the folder that contains `shell.exe`.
+
+  The setup registers it in Windows itself.
+- **FFmpeg, Everything, LosslessCut** can be portable too: their folders are found the same way
+  (the name contains the program name, up to two levels from a drive root plus two levels inside, for example `D:/Soft/ffmpeg-9.0/bin`).
+  Portable Everything needs administrator rights to index drives (see above).
+- **Moved the Nilesoft Shell folder?** Run `Install.cmd` again (or register it by hand:
+  `shell.exe -register -treat -restart` from the new folder as administrator). The menu scripts take their path
+  from the Nilesoft folder, so nothing inside needs editing.
+- **Moved FFmpeg, Everything or LosslessCut?** Run `Install.cmd` again or put the new path into `imports/paths.nss`.
+- **What the preset leaves outside its folder**: the Nilesoft registration in Windows (`shell.exe -unregister` removes it),
+  its settings in the registry key `HKEY_CURRENT_USER/Software/Nilesoft-FFmpeg-menu` and the rename undo file
+  in `%LOCALAPPDATA%`. Nothing else.
 
 ---
 
