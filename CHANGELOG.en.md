@@ -8,6 +8,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 
 ## [Unreleased]
 
+### Changed
+- Comments in `dev/` and the header comments of the menu files (`ffmpeg.nss`, `tools.nss`) are in English.
+  The hints in `paths.nss`, which users edit, stay in the menu language.
+
 ## [1.0.0] - 2026-10-20
 
 First release.

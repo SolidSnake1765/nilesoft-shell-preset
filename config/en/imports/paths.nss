@@ -31,5 +31,5 @@ $lc_exe = eval(if(path.exists(lc_exe_2), lc_exe_2, path.combine(user.dir, 'scoop
 
 // Hint whether there is a graphics card for video encoding, until FFmpeg has checked it:
 // the NVIDIA driver puts nvidia-smi.exe into System32, the AMD driver puts amfrt64.dll there.
-// Intel graphics cannot be detected this way - use “FFmpeg > Settings > Check graphics card” for it.
+// Intel graphics cannot be detected this way - use "FFmpeg > Settings > Check graphics card" for it.
 $has_gpu_hint = path.exists(path.combine(sys.bin, 'nvidia-smi.exe')) or path.exists(path.combine(sys.bin, 'amfrt64.dll'))

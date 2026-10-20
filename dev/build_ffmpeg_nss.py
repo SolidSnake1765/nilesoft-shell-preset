@@ -10,8 +10,8 @@ import sys
 
 tmpl_path, out_path = sys.argv[1], sys.argv[2]
 SEP = 'separator'
-# Пункты «на видеокарте» видны, если проверка нашла кодировщик видеокарты (значение GpuEnc в реестре пишет
-# ffmpeg-run.ps1). Пока проверки не было — если есть драйвер NVIDIA или AMD (переменная из paths.nss)
+# "On the graphics card" items are shown when the check found a GPU encoder (ffmpeg-run.ps1 writes GpuEnc
+# to the registry). Before the first check: when an NVIDIA or AMD driver is present ($has_gpu_hint from paths.nss)
 GPU = ("if(reg.get(ff_key, 'GpuEnc') == 'nvenc' or reg.get(ff_key, 'GpuEnc') == 'amf' or reg.get(ff_key, 'GpuEnc') == 'qsv', true, "
        "if(reg.get(ff_key, 'GpuEnc') == 'none', false, has_gpu_hint))")
 
@@ -75,7 +75,7 @@ rotate_items = lambda preset: [
     item('Отразить по вертикали', preset, 'vflip'),
 ]
 
-MULTI = 'sel.count>1'   # «Склеить» показывается, только если выбрано несколько файлов
+MULTI = 'sel.count>1'   # "Join" is shown only when several files are selected
 
 speed_items = [item(f'{s}×', 'speed', s) for s in ('0.5', '0.75', '1.25', '1.5', '2')]
 
@@ -261,7 +261,7 @@ settings += ['\t}']
 
 body = []
 body += [
-    '\t// Переключатель режима: копия / замена',
+    '\t// Mode switch: copy / replace',
     "\titem(mode='multiple' title=if(reg.get(ff_key, 'Mode') == 'replace', 'Режим: замена', 'Режим: копия')",
     "\t\ttip=if(reg.get(ff_key, 'Mode') == 'replace', 'Исходник после обработки уходит в Корзину, результат получает его имя. Нажми, чтобы включить копию', 'Результат сохраняется рядом, исходник не трогается. Нажми, чтобы включить замену')",
     "\t\tcmd=reg.set(ff_key, 'Mode', if(reg.get(ff_key, 'Mode') == 'replace', 'copy', 'replace'), reg.sz))",
@@ -269,7 +269,7 @@ body += [
 body += settings + ['\tseparator()']
 for sec in (video, audio, image):
     body += render(sec, '\t')
-body += ['\tseparator()', '\t// Информация']
+body += ['\tseparator()', '\t// Info']
 pair = menu('Видео + музыка', [
     item('Заменить звук музыкой', 'addaudio', 'replace', tip='Звук видео заменяется выбранным файлом; короткая музыка повторяется по кругу'),
     item('Добавить музыку фоном', 'addaudio', 'mix', tip='Музыка тише и звучит поверх родного звука видео; короткая повторяется по кругу'),

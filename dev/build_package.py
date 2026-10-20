@@ -20,7 +20,7 @@ py = [sys.executable, '-I']
 
 
 def fix_text(path):
-    """In the package the generators live in dev/, not in the author's dev/ folder."""
+    """In the package the generators live in dev/, not in the author's own source folder."""
     raw = open(path, 'rb').read()
     bom = raw.startswith(b'\xef\xbb\xbf')
     t = raw.decode('utf-8-sig').replace('dev/', 'dev/')
@@ -29,9 +29,6 @@ def fix_text(path):
 
 for sub in ('config', 'setup', 'dev'):
     shutil.rmtree(os.path.join(pkg, sub), ignore_errors=True)
-for old in ('Установить.cmd',):
-    if os.path.exists(os.path.join(pkg, old)):
-        os.remove(os.path.join(pkg, old))
 
 ru = os.path.join(pkg, 'config', 'ru')
 en = os.path.join(pkg, 'config', 'en')
@@ -44,9 +41,12 @@ names = ['shell.nss'] + ['imports/' + n for n in imports + ['ffmpeg-run.ps1', 't
 for name in names:
     dst = os.path.join(ru, name)
     if name == 'imports/paths.nss':
-        subprocess.run(py + [os.path.join(here, 'build_paths_nss.py'), dst], check=True, stdout=subprocess.DEVNULL)
-    else:
-        shutil.copy2(os.path.join(src, name), dst)
+        # Users edit this file by hand, so the generator writes its comments in each language itself
+        for lang, folder in (('ru', ru), ('en', en)):
+            subprocess.run(py + [os.path.join(here, 'build_paths_nss.py'), os.path.join(folder, name), '--lang', lang],
+                           check=True, stdout=subprocess.DEVNULL)
+        continue
+    shutil.copy2(os.path.join(src, name), dst)
     fix_text(dst)
     if name == 'imports/images.nss':
         shutil.copy2(dst, os.path.join(en, name))   # icons only, no text
