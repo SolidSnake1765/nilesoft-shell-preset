@@ -129,4 +129,5 @@ Without those programs these submenus simply do not appear.
   asks for confirmation first ("No" is the default).
 - **Taskbar**: apps (Paint, Edge, Calculator, Registry Editor), window arrangement,
   desktop, settings, Task Manager.
-  With Shift: the Nilesoft Shell menu itself: configuration, program folder, documentation.
+  With Shift: the Nilesoft Shell menu itself: configuration, program folder, documentation and **Theme**:
+  switches the menu theme (pictures of every theme are in the [README](README.en.md#themes)).

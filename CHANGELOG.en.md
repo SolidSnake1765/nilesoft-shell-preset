@@ -9,6 +9,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 ## [Unreleased]
 
 ### Added
+- **11 menu themes**: Acrylic (the old theme, default), Modern, Light, Neon, Dracula, Nord, Codec, Sunset,
+  macOS, Turquoise glass, Fluent. Pick one in the setup and switch any time:
+  Shift + right-click the taskbar > Nilesoft Shell > Theme, without restarting Explorer.
+  Themes live in `imports/themes/` instead of `imports/theme.nss` (the setup removes the old file, a copy is in `backup`).
 - **GIF → MP4 like Telegram**: a regular video instead of a GIF, many times smaller and smoother.
 - **Telegram sticker** (WEBM, VP9, 512 px, up to 3 seconds, no audio) from a video or a GIF; transparency is kept.
 - "Make from video": **square 1:1** (the video centered over a blurred copy) and **boomerang** (forward and back).

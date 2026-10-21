@@ -4,6 +4,34 @@
 	item(title="Менеджер" image=\uE0F3 admin cmd='"@app.exe"')
 	item(title="Папка программы" image=\uE0E8 cmd='"@app.dir"')
 	item(title="Версия\t"+@app.ver vis=label col=1)
+	// Тема: скрипт переписывает строку import в shell.nss (wait=1 — ждём его), @app.reload — Nilesoft перечитает
+	// конфиг при следующем открытии меню, без перезапуска Проводника
+	menu(title='Тема' image=\uE116)
+	{
+		item(title='Акрил' checked=(preset_theme=='acrylic') window='hidden' wait=1
+			cmd='powershell.exe' args='@tools_hidden -Action theme -Value acrylic -Folder "@app.dir" @app.reload')
+		item(title='Modern' checked=(preset_theme=='modern') window='hidden' wait=1
+			cmd='powershell.exe' args='@tools_hidden -Action theme -Value modern -Folder "@app.dir" @app.reload')
+		item(title='Светлая' checked=(preset_theme=='light') window='hidden' wait=1
+			cmd='powershell.exe' args='@tools_hidden -Action theme -Value light -Folder "@app.dir" @app.reload')
+		item(title='Неон' checked=(preset_theme=='neon') window='hidden' wait=1
+			cmd='powershell.exe' args='@tools_hidden -Action theme -Value neon -Folder "@app.dir" @app.reload')
+		item(title='Dracula' checked=(preset_theme=='dracula') window='hidden' wait=1
+			cmd='powershell.exe' args='@tools_hidden -Action theme -Value dracula -Folder "@app.dir" @app.reload')
+		item(title='Nord' checked=(preset_theme=='nord') window='hidden' wait=1
+			cmd='powershell.exe' args='@tools_hidden -Action theme -Value nord -Folder "@app.dir" @app.reload')
+		item(title='Кодек' checked=(preset_theme=='codec') window='hidden' wait=1
+			cmd='powershell.exe' args='@tools_hidden -Action theme -Value codec -Folder "@app.dir" @app.reload')
+		item(title='Закат' checked=(preset_theme=='sunset') window='hidden' wait=1
+			cmd='powershell.exe' args='@tools_hidden -Action theme -Value sunset -Folder "@app.dir" @app.reload')
+		sep
+		item(title='macOS' checked=(preset_theme=='macos') window='hidden' wait=1
+			cmd='powershell.exe' args='@tools_hidden -Action theme -Value macos -Folder "@app.dir" @app.reload')
+		item(title='Бирюзовое стекло' checked=(preset_theme=='glass') window='hidden' wait=1
+			cmd='powershell.exe' args='@tools_hidden -Action theme -Value glass -Folder "@app.dir" @app.reload')
+		item(title='Fluent (цвет акцента Windows)' checked=(preset_theme=='fluent') window='hidden' wait=1
+			cmd='powershell.exe' args='@tools_hidden -Action theme -Value fluent -Folder "@app.dir" @app.reload')
+	}
 	item(title="Документация" image=\uE1C4 cmd='https://nilesoft.org/docs')
 	item(title="Поддержать автора" image=\uE1A7 cmd='https://nilesoft.org/donate')
 }

@@ -4,6 +4,34 @@
 	item(title="Manager" image=\uE0F3 admin cmd='"@app.exe"')
 	item(title="Program folder" image=\uE0E8 cmd='"@app.dir"')
 	item(title="Version\t"+@app.ver vis=label col=1)
+	// Theme: the script rewrites the import line in shell.nss (wait=1 - we wait for it), @app.reload - Nilesoft rereads
+	// the config the next time a menu opens, without restarting Explorer
+	menu(title='Theme' image=\uE116)
+	{
+		item(title='Acrylic' checked=(preset_theme=='acrylic') window='hidden' wait=1
+			cmd='powershell.exe' args='@tools_hidden -Action theme -Value acrylic -Folder "@app.dir" @app.reload')
+		item(title='Modern' checked=(preset_theme=='modern') window='hidden' wait=1
+			cmd='powershell.exe' args='@tools_hidden -Action theme -Value modern -Folder "@app.dir" @app.reload')
+		item(title='Light' checked=(preset_theme=='light') window='hidden' wait=1
+			cmd='powershell.exe' args='@tools_hidden -Action theme -Value light -Folder "@app.dir" @app.reload')
+		item(title='Neon' checked=(preset_theme=='neon') window='hidden' wait=1
+			cmd='powershell.exe' args='@tools_hidden -Action theme -Value neon -Folder "@app.dir" @app.reload')
+		item(title='Dracula' checked=(preset_theme=='dracula') window='hidden' wait=1
+			cmd='powershell.exe' args='@tools_hidden -Action theme -Value dracula -Folder "@app.dir" @app.reload')
+		item(title='Nord' checked=(preset_theme=='nord') window='hidden' wait=1
+			cmd='powershell.exe' args='@tools_hidden -Action theme -Value nord -Folder "@app.dir" @app.reload')
+		item(title='Codec' checked=(preset_theme=='codec') window='hidden' wait=1
+			cmd='powershell.exe' args='@tools_hidden -Action theme -Value codec -Folder "@app.dir" @app.reload')
+		item(title='Sunset' checked=(preset_theme=='sunset') window='hidden' wait=1
+			cmd='powershell.exe' args='@tools_hidden -Action theme -Value sunset -Folder "@app.dir" @app.reload')
+		sep
+		item(title='macOS' checked=(preset_theme=='macos') window='hidden' wait=1
+			cmd='powershell.exe' args='@tools_hidden -Action theme -Value macos -Folder "@app.dir" @app.reload')
+		item(title='Turquoise glass' checked=(preset_theme=='glass') window='hidden' wait=1
+			cmd='powershell.exe' args='@tools_hidden -Action theme -Value glass -Folder "@app.dir" @app.reload')
+		item(title='Fluent (Windows accent color)' checked=(preset_theme=='fluent') window='hidden' wait=1
+			cmd='powershell.exe' args='@tools_hidden -Action theme -Value fluent -Folder "@app.dir" @app.reload')
+	}
 	item(title="Documentation" image=\uE1C4 cmd='https://nilesoft.org/docs')
 	item(title="Donate" image=\uE1A7 cmd='https://nilesoft.org/donate')
 }

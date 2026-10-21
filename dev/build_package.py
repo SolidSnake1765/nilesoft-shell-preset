@@ -2,7 +2,8 @@
 
 Usage: python -I build_package.py <nilesoft dir> <package dir>
 
-  config/ru  - shell.nss + the imported files (Russian, as in the live config) with an empty paths.nss
+  config/ru  - shell.nss + the imported files (Russian, as in the live config) with an empty paths.nss;
+               all themes from imports/themes/, shell.nss always imports the default one (DEFAULT_THEME)
   config/en  - the same files translated by i18n/translate.py
   setup/     - install.ps1;  Install.cmd in the root starts it
   dev/       - generators, translation dictionaries and the checker
@@ -19,6 +20,9 @@ here = os.path.dirname(os.path.abspath(__file__))
 py = [sys.executable, '-I']
 
 
+BOM = bytes([0xEF, 0xBB, 0xBF])
+
+
 def fix_text(path):
     """In the package the generators live in dev/, not in the author's own source folder."""
     raw = open(path, 'rb').read()
@@ -32,12 +36,16 @@ for sub in ('config', 'setup', 'dev'):
 
 ru = os.path.join(pkg, 'config', 'ru')
 en = os.path.join(pkg, 'config', 'en')
-os.makedirs(os.path.join(ru, 'imports'))
-os.makedirs(os.path.join(en, 'imports'))
+os.makedirs(os.path.join(ru, 'imports', 'themes'))
+os.makedirs(os.path.join(en, 'imports', 'themes'))
 
+# The live config may use any theme; the package always starts with the default one
+DEFAULT_THEME = 'acrylic'
+THEME_LINE = r"^import\s+'imports/themes/[^']+\.nss'"
 shell = open(os.path.join(src, 'shell.nss'), encoding='utf-8-sig').read()
-imports = re.findall(r"^import\s+'imports/([^']+)'", shell, re.M)
-names = ['shell.nss'] + ['imports/' + n for n in imports + ['ffmpeg-run.ps1', 'tools-run.ps1']]
+imports = [n for n in re.findall(r"^import\s+'imports/([^']+)'", shell, re.M) if not n.startswith('themes/')]
+themes = sorted('themes/' + n for n in os.listdir(os.path.join(src, 'imports', 'themes')) if n.endswith('.nss'))
+names = ['shell.nss'] + ['imports/' + n for n in imports + themes + ['ffmpeg-run.ps1', 'tools-run.ps1']]
 for name in names:
     dst = os.path.join(ru, name)
     if name == 'imports/paths.nss':
@@ -48,6 +56,11 @@ for name in names:
         continue
     shutil.copy2(os.path.join(src, name), dst)
     fix_text(dst)
+    if name == 'shell.nss':
+        raw = open(dst, 'rb').read()
+        text, n = re.subn(THEME_LINE, f"import 'imports/themes/{DEFAULT_THEME}.nss'", raw.decode('utf-8-sig'), flags=re.M)
+        assert n == 1, 'shell.nss: no theme import line'
+        open(dst, 'wb').write(raw[:3] * raw.startswith(BOM) + text.encode('utf-8'))
     if name == 'imports/images.nss':
         shutil.copy2(dst, os.path.join(en, name))   # icons only, no text
     else:

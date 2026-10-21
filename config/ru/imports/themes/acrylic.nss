@@ -1,9 +1,12 @@
-﻿theme
+// Тема «Акрил» (по умолчанию): modern, доработанная — плотный акриловый фон, тень, цвет акцента Windows
+$preset_theme = 'acrylic'
+
+theme
 {
     name = "modern"
-    dark = auto
+    dark = true
 
-    // Фон: плотнее, чем было (opacity = 5), и акрил вместо простого размытия. Меньше opacity — прозрачнее
+    // Меньше opacity — прозрачнее
     background
     {
         color = #202020

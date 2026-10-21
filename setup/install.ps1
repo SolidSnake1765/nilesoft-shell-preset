@@ -3,16 +3,17 @@
 #
 #   1. finds the Nilesoft Shell folder (or asks for it);
 #   2. backs up the current menu to <Nilesoft Shell>/backup/;
-#   3. copies the preset (config/ru or config/en);
+#   3. copies the preset (config/ru or config/en) and turns on the chosen theme;
 #   4. finds ffmpeg, Everything and LosslessCut and writes their paths to imports/paths.nss;
 #   5. checks which graphics card can encode video;
 #   6. registers Nilesoft Shell and restarts Explorer.
-# Dry run: -Target <folder> -NoRegister -Yes -NoElevate [-Lang ru|en]
+# Dry run: -Target <folder> -NoRegister -Yes -NoElevate [-Lang ru|en] [-Theme <name>]
 
 [CmdletBinding(PositionalBinding = $false)]
 param(
     [string]$Target = '',     # Nilesoft Shell folder (where shell.exe is)
     [ValidateSet('', 'ru', 'en')][string]$Lang = '',   # menu language; empty = ask (default from Windows)
+    [string]$Theme = '',      # menu theme (file name in imports/themes without .nss); empty = ask
     [switch]$NoRegister,      # do not register / restart Explorer
     [switch]$Yes,             # no questions: take the first found option
     [switch]$NoElevate        # do not ask for administrator rights
@@ -38,6 +39,7 @@ if (-not $isAdmin -and -not $NoElevate) {
     $argLine = '-NoProfile -ExecutionPolicy Bypass -File "' + $PSCommandPath + '"'
     if ($Target) { $argLine += ' -Target "' + $Target + '"' }
     if ($Lang) { $argLine += ' -Lang ' + $Lang }
+    if ($Theme) { $argLine += ' -Theme ' + $Theme }
     if ($NoRegister) { $argLine += ' -NoRegister' }
     try {
         Start-Process -FilePath 'powershell.exe' -ArgumentList $argLine -Verb RunAs
@@ -69,6 +71,31 @@ if (-not $Lang) {
 $ConfigDir = Join-Path (Join-Path $Root 'config') $Lang
 if (-not (Test-Path -LiteralPath (Join-Path $ConfigDir 'shell.nss'))) {
     Say (T "Не найдены файлы пресета: $ConfigDir. Распакуй архив целиком." "Preset files not found: $ConfigDir. Extract the whole archive.") Red
+    Done 1
+}
+
+# ---------- Menu theme ----------
+# id, Russian name, English name, Russian description, English description
+$themes = @(
+    @('acrylic', 'Акрил', 'Acrylic', 'плотный акрил, тень, цвет акцента Windows', 'dense acrylic, shadow, Windows accent color'),
+    @('modern', 'Modern', 'Modern', 'почти прозрачное, с размытием', 'almost transparent, with blur'),
+    @('light', 'Светлая', 'Light', 'как меню Windows 11 в светлом режиме', 'like the Windows 11 menu in light mode'),
+    @('neon', 'Неон', 'Neon', 'чёрный фон, бирюзовое свечение, малиновая подсветка', 'black background, cyan glow, magenta highlight'),
+    @('dracula', 'Dracula', 'Dracula', 'палитра Dracula: фиолетовый, розовый, зелёный', 'Dracula palette: purple, pink, green'),
+    @('nord', 'Nord', 'Nord', 'палитра Nord: серо-синий фон, голубые акценты', 'Nord palette: blue-gray background, frosty blue accents'),
+    @('codec', 'Кодек', 'Codec', 'зелёный экран рации из Metal Gear Solid', 'the green Codec screen from Metal Gear Solid'),
+    @('sunset', 'Закат', 'Sunset', 'градиент от фиолетового к оранжевому', 'purple to orange gradient'),
+    @('macos', 'macOS', 'macOS', 'скруглённое, без значков', 'rounded, no icons'),
+    @('glass', 'Бирюзовое стекло', 'Turquoise glass', 'чёрное стекло, бирюзовый текст', 'black glass, turquoise text'),
+    @('fluent', 'Fluent', 'Fluent', 'градиент из цвета акцента Windows', 'gradient made of the Windows accent color')
+)
+$themes = @($themes | Where-Object { Test-Path -LiteralPath (Join-Path $ConfigDir "imports/themes/$($_[0]).nss") })
+function Get-ThemeName([string]$id) {
+    foreach ($th in $themes) { if ($th[0] -eq $id) { return $(if ($Lang -eq 'ru') { $th[1] } else { $th[2] }) } }
+    return $id
+}
+if ($Theme -and -not ($themes | Where-Object { $_[0] -eq $Theme })) {
+    Say ((T 'Нет такой темы: ' 'No such theme: ') + $Theme + (T '. Есть: ' '. Available: ') + (($themes | ForEach-Object { $_[0] }) -join ', ')) Red
     Done 1
 }
 
@@ -254,6 +281,32 @@ try {
     }
 } catch { }
 
+# ---------- Theme question ----------
+if (-not $Theme) {
+    $Theme = 'acrylic'
+    $oldShell = Join-Path $Target 'shell.nss'
+    if ((Test-Path -LiteralPath $oldShell) -and ((Get-Content -LiteralPath $oldShell -Raw) -match "(?m)^import\s+'imports/themes/([A-Za-z0-9_-]+)\.nss'") -and
+        ($themes | Where-Object { $_[0] -eq $matches[1] })) {
+        $Theme = $matches[1]   # reinstall: keep the theme picked before
+    }
+    if (-not $Yes) {
+        Say ''
+        Say (T 'Тема меню (картинки всех тем — в README):' 'Menu theme (pictures of every theme are in the README):') Cyan
+        for ($i = 0; $i -lt $themes.Count; $i++) {
+            $th = $themes[$i]
+            $name = $(if ($Lang -eq 'ru') { $th[1] } else { $th[2] })
+            $desc = $(if ($script:ru) { $th[3] } else { $th[4] })
+            Say ('  [{0,2}] {1,-17} {2}' -f ($i + 1), $name, $desc)
+        }
+        Say (T '  Сменить тему можно и потом: Shift + правый клик по панели задач → Nilesoft Shell → Тема' `
+               '  You can change it later too: Shift + right-click the taskbar > Nilesoft Shell > Theme') DarkGray
+        $def = 1 + [array]::IndexOf(@($themes | ForEach-Object { $_[0] }), $Theme)
+        $a = (Read-Host (T "Enter — $def ($(Get-ThemeName $Theme))" "Enter = $def ($(Get-ThemeName $Theme))")).Trim()
+        $n = 0
+        if ([int]::TryParse($a, [ref]$n) -and $n -ge 1 -and $n -le $themes.Count) { $Theme = $themes[$n - 1][0] }
+    }
+}
+
 # ---------- 2. Backup of the current menu ----------
 $imports = Join-Path $Target 'imports'
 $oldCfg = Join-Path $Target 'shell.nss'
@@ -271,10 +324,24 @@ Copy-Item -LiteralPath (Join-Path $ConfigDir 'shell.nss') -Destination $Target -
 Get-ChildItem -LiteralPath (Join-Path $ConfigDir 'imports') -File | ForEach-Object {
     Copy-Item -LiteralPath $_.FullName -Destination $imports -Force
 }
+$themeDir = Join-Path $imports 'themes'
+New-Item -ItemType Directory -Force -Path $themeDir | Out-Null
+Get-ChildItem -LiteralPath (Join-Path $ConfigDir 'imports/themes') -File | ForEach-Object {
+    Copy-Item -LiteralPath $_.FullName -Destination $themeDir -Force
+}
+# Version 1.0.0 kept the theme in imports/theme.nss; now it is unused (the old copy is in the backup)
+$oldTheme = Join-Path $imports 'theme.nss'
+if (Test-Path -LiteralPath $oldTheme) { Remove-Item -LiteralPath $oldTheme -Force }
+# The chosen theme: the import line in shell.nss
+$cfg = Join-Path $Target 'shell.nss'
+$text = [IO.File]::ReadAllText($cfg)
+$text = [regex]::Replace($text, "(?m)^import\s+'imports/themes/[^']+\.nss'", "import 'imports/themes/$Theme.nss'")
+[IO.File]::WriteAllText($cfg, $text, (New-Object Text.UTF8Encoding($false)))
 # Files from the internet carry the "downloaded" mark; remove it
-Get-ChildItem -LiteralPath $imports -File | Unblock-File -ErrorAction SilentlyContinue
+Get-ChildItem -LiteralPath $imports -File -Recurse | Unblock-File -ErrorAction SilentlyContinue
 Unblock-File -LiteralPath (Join-Path $Target 'shell.nss') -ErrorAction SilentlyContinue
 Say ((T 'Файлы пресета скопированы, язык меню: ' 'Preset files copied, menu language: ') + $(if ($Lang -eq 'ru') { 'Русский' } else { 'English' })) Green
+Say ((T 'Тема: ' 'Theme: ') + (Get-ThemeName $Theme)) Green
 
 # ---------- 4. Programs ----------
 $local = Join-Path $env:USERPROFILE 'AppData/Local'

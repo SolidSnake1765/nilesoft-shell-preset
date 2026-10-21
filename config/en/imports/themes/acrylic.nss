@@ -1,9 +1,12 @@
-﻿theme
+// Theme “Acrylic” (default): modern, reworked - dense acrylic background, shadow, Windows accent color
+$preset_theme = 'acrylic'
+
+theme
 {
     name = "modern"
-    dark = auto
+    dark = true
 
-    // Background: denser than the default (opacity = 5) and acrylic instead of plain blur. Lower opacity = more transparent
+    // Lower opacity = more transparent
     background
     {
         color = #202020

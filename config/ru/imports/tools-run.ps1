@@ -497,6 +497,29 @@ function Invoke-Everything {
     return $true
 }
 
+# ---------- Тема меню ----------
+# Меняет строку import темы в shell.nss на imports/themes/<имя>.nss. -Folder — папка Nilesoft Shell
+function Invoke-Theme {
+    $cfg = Join-Path $Folder 'shell.nss'
+    $line = "import 'imports/themes/$Value.nss'"
+    if (-not (Test-Path -LiteralPath (Join-Path $Folder "imports\themes\$Value.nss"))) { throw "Нет файла темы imports\themes\$Value.nss" }
+    $raw = [IO.File]::ReadAllBytes($cfg)
+    $bom = $raw.Length -ge 3 -and $raw[0] -eq 0xEF -and $raw[1] -eq 0xBB -and $raw[2] -eq 0xBF
+    $text = [IO.File]::ReadAllText($cfg)
+    $re = "(?m)^import\s+'imports/(theme|themes/[^']+)\.nss'"
+    if ($text -notmatch $re) { throw 'В shell.nss нет строки import темы' }
+    $new = [regex]::Replace($text, $re, $line.Replace('$', '$$'))
+    if ($new -eq $text) { return $true }
+    try {
+        [IO.File]::WriteAllText($cfg, $new, (New-Object Text.UTF8Encoding($bom)))
+    } catch {
+        # Nilesoft в Program Files: повторить от имени администратора (.NET-ошибка приходит обёрнутой)
+        if (-not ($_.Exception.InnerException -is [UnauthorizedAccessException])) { throw }
+        Start-Process powershell.exe -Verb RunAs -WindowStyle Hidden -Wait -ArgumentList ('-NoProfile -ExecutionPolicy Bypass -File "' + $PSCommandPath + '" -Action theme -Value ' + $Value + ' -Folder "' + $Folder + '"')
+    }
+    return $true
+}
+
 $result = $false
 try {
     switch -Wildcard ($Action) {
@@ -507,6 +530,10 @@ try {
         'iso-*'      { $result = Invoke-Image }
         'power'      { $result = Invoke-Power; return }
         'everything' { $result = Invoke-Everything; return }
+        'theme'      {
+            try { $result = Invoke-Theme } catch { [void](New-Object -ComObject WScript.Shell).Popup($_.Exception.Message, 0, 'Тема меню', 16 + 262144) }
+            return
+        }
         default      { Write-Host "Неизвестное действие: $Action" -ForegroundColor Red }
     }
 } catch {

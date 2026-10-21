@@ -443,4 +443,9 @@ EN = {
     'коллаж в столбик': 'collage in a column',
     'коллаж в ряд': 'collage in a row',
     'Коллаж из $($sorted.Count) картинок  ->  $([IO.Path]::GetFileName($out))': 'Collage of $($sorted.Count) images  ->  $([IO.Path]::GetFileName($out))',
+    'Тема меню': 'Menu theme',
+    'Меняет строку import темы в shell.nss на imports/themes/<имя>.nss. -Folder — папка Nilesoft Shell': 'Changes the theme import line in shell.nss to imports/themes/<name>.nss. -Folder = the Nilesoft Shell folder',
+    'Нет файла темы imports': 'No theme file imports',
+    'В shell.nss нет строки import темы': 'shell.nss has no theme import line',
+    'в Program Files: повторить от имени администратора (.NET-ошибка приходит обёрнутой)': 'in Program Files: retry as administrator (the .NET error comes wrapped)',
 }

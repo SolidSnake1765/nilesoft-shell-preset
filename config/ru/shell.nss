@@ -8,7 +8,9 @@ settings
 	tip.enabled=true
 }
 
-import 'imports/theme.nss'
+// Тема: файлы лежат в imports/themes/ — поменяй имя файла или выбери тему в меню
+// (Shift + правый клик по панели задач → Nilesoft Shell → Тема)
+import 'imports/themes/acrylic.nss'
 import 'imports/images.nss'
 // Пути к ffmpeg, Everything и LosslessCut — до остальных импортов, они ими пользуются
 import 'imports/paths.nss'

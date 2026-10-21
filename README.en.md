@@ -4,7 +4,7 @@
 
 My personal right-click menu for Windows Explorer. The main feature is the **FFmpeg menu**: convert,
 compress, trim and fix video, audio and images in a couple of clicks, including fast encoding on
-NVIDIA, AMD and Intel graphics. Plus a clean translucent theme, Everything search, hashes, batch rename, share-as-link, disk images, power options and more.
+NVIDIA, AMD and Intel graphics. Plus 11 themes to choose from, Everything search, hashes, batch rename, share-as-link, disk images, power options and more.
 The menu comes in English and Russian. What every item does: [MENU.en.md](MENU.en.md).
 
 Made and tested on **Windows 11** with **Nilesoft Shell 1.9.18**.
@@ -33,6 +33,30 @@ Screenshots show the Russian menu; the English one has the same items.
 
 </details>
 
+## Themes
+
+11 themes: pick one during setup and switch any time right from the menu.
+
+| | | | |
+|---|---|---|---|
+| Acrylic (default)<br><img src="docs/screenshots/themes/acrylic.png" width="170" alt="Acrylic (default)"> | Modern<br><img src="docs/screenshots/themes/modern.png" width="170" alt="Modern"> | Light<br><img src="docs/screenshots/themes/light.png" width="170" alt="Light"> | Neon<br><img src="docs/screenshots/themes/neon.png" width="170" alt="Neon"> |
+| Dracula<br><img src="docs/screenshots/themes/dracula.png" width="170" alt="Dracula"> | Nord<br><img src="docs/screenshots/themes/nord.png" width="170" alt="Nord"> | Codec<br><img src="docs/screenshots/themes/codec.png" width="170" alt="Codec"> | Sunset<br><img src="docs/screenshots/themes/sunset.png" width="170" alt="Sunset"> |
+| macOS<br><img src="docs/screenshots/themes/macos.png" width="170" alt="macOS"> | Turquoise glass<br><img src="docs/screenshots/themes/glass.png" width="170" alt="Turquoise glass"> | Fluent<br><img src="docs/screenshots/themes/fluent.png" width="170" alt="Fluent"> |  |
+
+**How to switch the theme:**
+
+- **From the menu**: Shift + right-click the taskbar → **Nilesoft Shell → Theme** → pick a theme.
+  The next menu already opens in it; the current theme has a check mark.
+- **During setup**: `Install.cmd` asks which theme to turn on. On a reinstall it offers the one you have now.
+- **By hand**: the themes are in `imports/themes/`, one file per theme. Open `shell.nss` in Notepad and change
+  the file name in the line `import 'imports/themes/acrylic.nss'`, for example to `neon.nss`. Save it and
+  **Ctrl + right-click** the desktop: that makes Nilesoft reread the settings (no need to restart Explorer).
+
+File names: `acrylic`, `modern`, `light`, `neon`, `dracula`, `nord`, `codec`, `sunset`, `macos`,
+`glass` (Turquoise glass), `fluent`. Fluent takes the Windows accent color (Settings → Personalization → Colors),
+so yours may be another color than the red one in the picture.
+The easiest way to make your own theme is to copy any of these: the settings are in the [Nilesoft docs](https://nilesoft.org/docs/configuration/themes).
+
 ---
 
 ## What is inside
@@ -44,7 +68,7 @@ Screenshots show the Russian menu; the English one has the same items.
 | `setup/install.ps1` | The setup script that `Install.cmd` starts |
 | `MENU.en.md`, `MENU.md` | Description of every menu item |
 | `CHANGELOG.en.md`, `CHANGELOG.md` | Changelog by version |
-| `docs/screenshots` | Screenshots for this page |
+| `docs/screenshots` | Screenshots for this page (`themes/` has every theme) |
 | `dev/` | For those who want to change the menu: file generators, the translation dictionary and a checker |
 
 Download: the green **Code → Download ZIP** button on GitHub (or the Releases section),
@@ -66,7 +90,7 @@ without a program you simply do not get its items. If you install one later, run
 ## Option 1. Automatic setup (easier)
 
 1. Run **`Install.cmd`** and click "Yes" when it asks for administrator rights.
-2. Pick the menu language (the default is your Windows language).
+2. Pick the menu language (the default is your Windows language) and the [theme](#themes) (the default is Acrylic).
 3. The setup will:
    - find the Nilesoft Shell folder;
    - save your current menu to `Nilesoft Shell/backup/before-preset-<date>`;
@@ -88,6 +112,7 @@ without a program you simply do not get its items. If you install one later, run
    file and `imports` folder somewhere: that is your current menu.
 2. Copy the contents of **`config/en`** (or `config/ru` for the Russian menu) into the Nilesoft Shell folder:
    the `shell.nss` file and the `imports` folder, replacing the files. Windows asks for administrator rights, allow it.
+   The Acrylic theme is on; to pick another one right away, see [Themes](#themes).
 3. If your programs are installed in unusual places, open `imports/paths.nss` in Notepad
    and put the paths in (see [Does it matter where programs are installed](#does-it-matter-where-programs-are-installed)).
    If they are installed the usual way, do nothing: the menu finds them itself.
@@ -233,6 +258,7 @@ and empty submenus are not shown.
 
 ## Troubleshooting
 
+- **A theme or a `.nss` edit did not apply.** Ctrl + right-click the desktop: Nilesoft rereads the settings.
 - **The menu did not change.** Restart Explorer or the computer. If that does not help, open a terminal
   as administrator in the Nilesoft Shell folder and run `shell.exe -register -treat -restart`.
 - **All items are gone or the menu looks odd.** Nilesoft writes errors to `shell.log` in its folder.
@@ -274,10 +300,11 @@ configuration language, themes and icons is in the Nilesoft Shell documentation:
 
 A few quick tips:
 
-- **Transparency and colors**: `imports/theme.nss` (`opacity`: lower = more transparent).
+- **Transparency and colors**: the file of your theme in `imports/themes/` (`opacity`: lower = more transparent).
 - **Program paths**: `imports/paths.nss`.
 - **Remove a whole menu**: in `shell.nss` put `//` in front of its `import 'imports/...'` line.
-- After an edit, save the file and restart Explorer (or the computer). Make a copy of the file before editing.
+- After an edit, save the file and Ctrl + right-click the desktop: Nilesoft rereads the settings
+  (if that does not help, restart Explorer). Make a copy of the file before editing.
   If the menu disappears, look at `shell.log` in the Nilesoft Shell folder: it says which line is wrong.
 
 ## Credits and licenses
@@ -285,6 +312,8 @@ A few quick tips:
 - This preset: MIT license, see [LICENSE](LICENSE).
 - Nilesoft Shell and its default menu files (`images.nss`, the base of `goto`, `terminal`, `file-manage`, `taskbar`, `develop`, `modify`): © Moudey, MIT license.
 - The WinRAR menu is based on a RubicBG snippet (CC0); the tools are rewritten after his library.
+- The macOS, Turquoise glass and Fluent themes come from the Nilesoft community, adapted to the preset. The Dracula
+  and Nord palettes belong to their authors ([draculatheme.com](https://draculatheme.com), [nordtheme.com](https://www.nordtheme.com), MIT).
 
 ---
 
