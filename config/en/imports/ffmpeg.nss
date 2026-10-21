@@ -295,8 +295,8 @@ menu(title='FFmpeg' mode='multiple' type='file' find=ff_video+'|'+ff_audio+'|'+f
 			item(mode='multiple' title='Remove audio'
 				tip='A copy of the video without the audio track, without re-encoding'
 				cmd='powershell.exe' args='@ff_run -Preset mute @sel(true," ")')
-			item(mode='multiple' title='Pick an audio track…'
-				tip='Lists the tracks with their languages and keeps one. Without re-encoding'
+			item(mode='multiple' title='Pick audio tracks…'
+				tip='Lists the tracks with their names and keeps the ones you pick - one or several. Without re-encoding'
 				cmd='powershell.exe' args='@ff_run -Preset pickaudio @sel(true," ")')
 			item(mode='multiple' title='Clean up voice noise'
 				tip='Noise reduction and hum cut. The video is not re-encoded'
@@ -338,6 +338,15 @@ menu(title='FFmpeg' mode='multiple' type='file' find=ff_video+'|'+ff_audio+'|'+f
 					tip='Best colors and smoothness, bigger file'
 					cmd='powershell.exe' args='@ff_run -Preset gif -Value 3 @sel(true," ")')
 			}
+			item(mode='multiple' title='Telegram sticker (WEBM)'
+				tip='512 px, up to 3 seconds, no audio - ready for the Stickers bot in Telegram'
+				cmd='powershell.exe' args='@ff_run -Preset tgsticker @sel(true," ")')
+			item(mode='multiple' title='Square 1:1 (Instagram, avatars)'
+				tip='1080×1080: video centered on a blurred background'
+				cmd='powershell.exe' args='@ff_run -Preset square @sel(true," ")')
+			item(mode='multiple' title='Boomerang (forward and back)'
+				tip='From the first 4 seconds: forward and right back, no audio'
+				cmd='powershell.exe' args='@ff_run -Preset boomerang @sel(true," ")')
 			item(mode='multiple' title='Vertical 9:16 (Shorts, TikTok, Reels)'
 				tip='1080×1920: video centered on a blurred background'
 				cmd='powershell.exe' args='@ff_run -Preset vertical @sel(true," ")')
@@ -405,6 +414,25 @@ menu(title='FFmpeg' mode='multiple' type='file' find=ff_video+'|'+ff_audio+'|'+f
 		item(mode='multiple' title='Trim silence at start and end'
 			tip='Cuts silence below -50 dB at both ends'
 			cmd='powershell.exe' args='@ff_run -Preset silence @sel(true," ")')
+		menu(mode='multiple' title='Effects')
+		{
+			item(mode='multiple' title='Fade in and out'
+				tip='The sound fades in over 2 seconds at the start and fades out over 3 at the end'
+				cmd='powershell.exe' args='@ff_run -Preset fade @sel(true," ")')
+			item(mode='multiple' title='Make mono'
+				tip='Both channels are mixed into one - for voice and podcasts'
+				cmd='powershell.exe' args='@ff_run -Preset mono @sel(true," ")')
+			separator()
+			item(mode='multiple' title='Slowed + reverb'
+				tip='Slower, lower and with an echo - like on TikTok'
+				cmd='powershell.exe' args='@ff_run -Preset slowed @sel(true," ")')
+			item(mode='multiple' title='Nightcore'
+				tip='Faster and higher'
+				cmd='powershell.exe' args='@ff_run -Preset nightcore @sel(true," ")')
+		}
+		item(mode='multiple' title='iPhone ringtone (M4R, 30 s)'
+			tip='The first 30 seconds with a fade-out at the end. Add it to the iPhone with iTunes or Finder'
+			cmd='powershell.exe' args='@ff_run -Preset ringtone @sel(true," ")')
 		item(mode='multiple' title='Trim…'
 			tip='Asks for start and end, without re-encoding'
 			cmd='powershell.exe' args='@ff_run -Preset trim @sel(true," ")')
@@ -443,6 +471,12 @@ menu(title='FFmpeg' mode='multiple' type='file' find=ff_video+'|'+ff_audio+'|'+f
 	}
 	menu(mode='multiple' expanded=1 find=ff_image)
 	{
+		item(mode='multiple' find='.gif' title='GIF → MP4 (like Telegram)'
+			tip='A regular video instead of a GIF: many times smaller and smoother. That is how Telegram stores GIFs'
+			cmd='powershell.exe' args='@ff_run -Preset gif2mp4 @sel(true," ")')
+		item(mode='multiple' find='.gif' title='GIF → Telegram sticker (WEBM)'
+			tip='512 px, up to 3 seconds, transparency is kept'
+			cmd='powershell.exe' args='@ff_run -Preset tgsticker @sel(true," ")')
 		menu(mode='multiple' title='Convert')
 		{
 			item(mode='multiple' find='!.jpg' title='To JPG'
@@ -508,8 +542,20 @@ menu(title='FFmpeg' mode='multiple' type='file' find=ff_video+'|'+ff_audio+'|'+f
 			item(mode='multiple' title='Flip vertically'
 				cmd='powershell.exe' args='@ff_run -Preset irotate -Value vflip @sel(true," ")')
 		}
+		item(mode='multiple' title='Crop to a square'
+			tip='From the center - for avatars and thumbnails'
+			cmd='powershell.exe' args='@ff_run -Preset squarecrop @sel(true," ")')
 		item(mode='multiple' title='Black and white'
 			cmd='powershell.exe' args='@ff_run -Preset gray @sel(true," ")')
+		menu(mode='multiple' where=sel.count>1 title='Collage of the selected')
+		{
+			item(mode='multiple' title='In a row'
+				tip='In alphabetical order, left to right; the images are fitted to one height'
+				cmd='powershell.exe' args='@ff_run -Preset collage -Value h @sel(true," ")')
+			item(mode='multiple' title='In a column'
+				tip='In alphabetical order, top to bottom; the images are fitted to one width'
+				cmd='powershell.exe' args='@ff_run -Preset collage -Value v @sel(true," ")')
+		}
 		item(mode='multiple' where=sel.count>1 title='Slideshow from the selected (MP4)'
 			tip='In alphabetical order, 1920×1080. Asks how many seconds to show each'
 			cmd='powershell.exe' args='@ff_run -Preset slideshow @sel(true," ")')

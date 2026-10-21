@@ -42,17 +42,22 @@ memory and graphics card. **Esc** or **Q** cancels: the unfinished file is delet
 - **Remux** to MP4 / MKV without re-encoding.
 - **Join the selected**, **split into parts** of N minutes, **strip metadata** (GPS, camera, dates).
 - **Subtitles**: extract, add the `.srt` file next to the video, or burn into the picture.
-- **Audio**: extract to MP3 / M4A / AAC / OPUS / OGG / FLAC / WAV / AIFF or as is; remove audio;
-  pick a track; clean up voice noise; louder / quieter; normalize loudness.
+- **Audio**: extract to MP3 / M4A / AAC / OPUS / OGG / FLAC / WAV / AIFF or as is to MKA (with several tracks it asks which ones: for MP3 and others each goes to its own file, for MKA all picked ones go into one); remove audio;
+  pick tracks (one or several, with their names, for example OBS tracks); clean up voice noise; louder / quieter; normalize loudness (with several tracks it asks which ones to change, the others stay as they are).
 - **Make from video**: GIF (three sizes), vertical 9:16 for Shorts / TikTok / Reels,
-  frame from the middle, 4×4 thumbnail grid, reverse, frames every N seconds, teaser.
+  frame from the middle, 4×4 thumbnail grid, reverse, frames every N seconds, teaser,
+  **Telegram sticker** (WEBM up to 3 seconds), **square 1:1** (Instagram, avatars), **boomerang** (forward and back).
 
 **Audio**: convert to MP3 / M4A / OPUS / OGG / FLAC / WAV / AIFF, louder / quieter, normalize loudness,
 trim silence at both ends, trim, speed, join, split, clean up noise, make a video
-(with the cover or a waveform), spectrogram, strip metadata.
+(with the cover or a waveform), spectrogram, strip metadata. Converting to MP3 / M4A / FLAC keeps the cover.
+**Effects**: fade in and out, make mono, Slowed + reverb, Nightcore.
+**iPhone ringtone**: M4R, the first 30 seconds with a fade-out.
 
 **Images**: convert to JPG / PNG / WebP / AVIF / ICO, compress for websites, upscale ×2–×10,
-downscale, rotate / flip, black and white, slideshow from the selected images.
+downscale, rotate / flip, black and white, slideshow from the selected images, **crop to a square**,
+**collage** of the selected images (in a row or in a column). In JPG transparent areas are filled with white.
+**GIF**: to MP4 the way Telegram does it (many times smaller and smoother), or to a Telegram sticker (WEBM).
 
 **More**: "Video + music" (select one video and one audio file to replace the audio or add background music),
 check a file for broken parts, file info, play in ffplay, FFmpeg version (hold Shift).

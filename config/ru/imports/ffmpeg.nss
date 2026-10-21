@@ -295,8 +295,8 @@ menu(title='FFmpeg' mode='multiple' type='file' find=ff_video+'|'+ff_audio+'|'+f
 			item(mode='multiple' title='Убрать звук'
 				tip='Копия видео без звуковой дорожки, без перекодирования'
 				cmd='powershell.exe' args='@ff_run -Preset mute @sel(true," ")')
-			item(mode='multiple' title='Выбрать звуковую дорожку…'
-				tip='Покажет список дорожек с языками и оставит одну. Без перекодирования'
+			item(mode='multiple' title='Выбрать звуковые дорожки…'
+				tip='Покажет дорожки с названиями и оставит выбранные — одну или несколько. Без перекодирования'
 				cmd='powershell.exe' args='@ff_run -Preset pickaudio @sel(true," ")')
 			item(mode='multiple' title='Убрать шум из голоса'
 				tip='Шумоподавление и срез гула. Видео не перекодируется'
@@ -338,6 +338,15 @@ menu(title='FFmpeg' mode='multiple' type='file' find=ff_video+'|'+ff_audio+'|'+f
 					tip='Лучшие цвета и плавность, файл больше'
 					cmd='powershell.exe' args='@ff_run -Preset gif -Value 3 @sel(true," ")')
 			}
+			item(mode='multiple' title='Стикер для Telegram (WEBM)'
+				tip='512 px, до 3 секунд, без звука — готовый файл для бота Stickers в Telegram'
+				cmd='powershell.exe' args='@ff_run -Preset tgsticker @sel(true," ")')
+			item(mode='multiple' title='Квадрат 1:1 (Instagram, аватарки)'
+				tip='1080×1080: видео по центру на размытом фоне'
+				cmd='powershell.exe' args='@ff_run -Preset square @sel(true," ")')
+			item(mode='multiple' title='Бумеранг (туда и обратно)'
+				tip='Из первых 4 секунд: вперёд и сразу назад, без звука'
+				cmd='powershell.exe' args='@ff_run -Preset boomerang @sel(true," ")')
 			item(mode='multiple' title='Вертикальное 9:16 (Shorts, TikTok, Reels)'
 				tip='1080×1920: видео по центру на размытом фоне'
 				cmd='powershell.exe' args='@ff_run -Preset vertical @sel(true," ")')
@@ -405,6 +414,25 @@ menu(title='FFmpeg' mode='multiple' type='file' find=ff_video+'|'+ff_audio+'|'+f
 		item(mode='multiple' title='Убрать тишину в начале и в конце'
 			tip='Отрезает тишину тише -50 дБ по краям'
 			cmd='powershell.exe' args='@ff_run -Preset silence @sel(true," ")')
+		menu(mode='multiple' title='Эффекты')
+		{
+			item(mode='multiple' title='Плавное начало и конец'
+				tip='Звук нарастает за 2 секунды в начале и затухает за 3 в конце'
+				cmd='powershell.exe' args='@ff_run -Preset fade @sel(true," ")')
+			item(mode='multiple' title='Сделать моно'
+				tip='Оба канала смешиваются в один — для голоса и подкастов'
+				cmd='powershell.exe' args='@ff_run -Preset mono @sel(true," ")')
+			separator()
+			item(mode='multiple' title='Slowed + reverb'
+				tip='Медленнее, ниже и с эхом — как в TikTok'
+				cmd='powershell.exe' args='@ff_run -Preset slowed @sel(true," ")')
+			item(mode='multiple' title='Nightcore'
+				tip='Быстрее и выше'
+				cmd='powershell.exe' args='@ff_run -Preset nightcore @sel(true," ")')
+		}
+		item(mode='multiple' title='Рингтон для iPhone (M4R, 30 с)'
+			tip='Первые 30 секунд с затуханием в конце. Добавить на iPhone можно через iTunes или Finder'
+			cmd='powershell.exe' args='@ff_run -Preset ringtone @sel(true," ")')
 		item(mode='multiple' title='Обрезать…'
 			tip='Спросит начало и конец, без перекодирования'
 			cmd='powershell.exe' args='@ff_run -Preset trim @sel(true," ")')
@@ -443,6 +471,12 @@ menu(title='FFmpeg' mode='multiple' type='file' find=ff_video+'|'+ff_audio+'|'+f
 	}
 	menu(mode='multiple' expanded=1 find=ff_image)
 	{
+		item(mode='multiple' find='.gif' title='GIF → MP4 (как в Telegram)'
+			tip='Обычное видео вместо GIF: в разы меньше и плавнее. Так GIF хранит Telegram'
+			cmd='powershell.exe' args='@ff_run -Preset gif2mp4 @sel(true," ")')
+		item(mode='multiple' find='.gif' title='GIF → стикер Telegram (WEBM)'
+			tip='512 px, до 3 секунд, прозрачность сохраняется'
+			cmd='powershell.exe' args='@ff_run -Preset tgsticker @sel(true," ")')
 		menu(mode='multiple' title='Конвертировать')
 		{
 			item(mode='multiple' find='!.jpg' title='В JPG'
@@ -508,8 +542,20 @@ menu(title='FFmpeg' mode='multiple' type='file' find=ff_video+'|'+ff_audio+'|'+f
 			item(mode='multiple' title='Отразить по вертикали'
 				cmd='powershell.exe' args='@ff_run -Preset irotate -Value vflip @sel(true," ")')
 		}
+		item(mode='multiple' title='Обрезать в квадрат'
+			tip='По центру — для аватарок и превью'
+			cmd='powershell.exe' args='@ff_run -Preset squarecrop @sel(true," ")')
 		item(mode='multiple' title='Чёрно-белое'
 			cmd='powershell.exe' args='@ff_run -Preset gray @sel(true," ")')
+		menu(mode='multiple' where=sel.count>1 title='Коллаж из выбранных')
+		{
+			item(mode='multiple' title='В ряд'
+				tip='По алфавиту, слева направо; картинки подгоняются под одну высоту'
+				cmd='powershell.exe' args='@ff_run -Preset collage -Value h @sel(true," ")')
+			item(mode='multiple' title='В столбик'
+				tip='По алфавиту, сверху вниз; картинки подгоняются под одну ширину'
+				cmd='powershell.exe' args='@ff_run -Preset collage -Value v @sel(true," ")')
+		}
 		item(mode='multiple' where=sel.count>1 title='Слайд-шоу из выбранных (MP4)'
 			tip='По алфавиту, 1920×1080. Спросит, сколько секунд показывать каждую'
 			cmd='powershell.exe' args='@ff_run -Preset slideshow @sel(true," ")')

@@ -239,6 +239,8 @@ and empty submenus are not shown.
   Usually it is a typo after editing a `.nss` file by hand. Restore the file from `backup` or run the setup again.
 - **The FFmpeg window closed with an error.** FFmpeg → Settings → turn on "Always wait for Enter at the end",
   repeat and read the error message.
+- **Processing suddenly slows down near the end and the window shows "CPU 0%".** ffmpeg is waiting for the disk, which
+  cannot keep up with writing (happens with nearly full SSDs and with HDDs on big files). Free up space or save results to another drive.
 - **An error when encoding on the graphics card.** Turn off "FFmpeg → Settings → Encode video on the graphics card"
   and update the graphics driver. Then "Check graphics card" again.
 - **The antivirus complains about scripts.** Menu items start the PowerShell scripts `ffmpeg-run.ps1` and

@@ -8,6 +8,39 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), ver
 
 ## [Unreleased]
 
+### Added
+- **GIF → MP4 like Telegram**: a regular video instead of a GIF, many times smaller and smoother.
+- **Telegram sticker** (WEBM, VP9, 512 px, up to 3 seconds, no audio) from a video or a GIF; transparency is kept.
+- "Make from video": **square 1:1** (the video centered over a blurred copy) and **boomerang** (forward and back).
+- Images: **crop to a square** from the center and a **collage** of the selected images, in a row or in a column.
+- Audio: an **Effects** menu (fade in and out, mono, Slowed + reverb, Nightcore) and an **iPhone ringtone** (M4R, 30 seconds).
+
+### Changed
+- "Pick audio tracks" (was "Pick an audio track"): keep several tracks at once with
+  "1 3", "1,3" or "2-4"; the first one becomes the default track. The numbers are asked once for all selected files.
+
+- "Louder", "Quieter", "Normalize loudness" and "Clean up voice noise" ask which tracks to change for videos with
+  several audio tracks (Enter = all). The others are copied unchanged, bit for bit.
+
+### Fixed
+- The track list shows the real track names like MPC-HC does (for example "Mic" or "Desktop audio" in OBS recordings),
+  plus sample rate, mono/stereo and bitrate. It used to say only "language not set".
+- "Extract audio" failed on videos with several audio tracks (OBS recordings, for example): MP3, WAV, FLAC and others
+  hold one track. Now it asks which tracks to extract (Enter = all) and saves each to its own file
+  named after the track: "video (Mic).mp3". "As is (MKA)" asks too, but puts the picked tracks into one file.
+  With a single track nothing is asked.
+- Audio track names are no longer lost by operations without re-encoding: picking tracks, remuxing
+  to MP4 / MKV, fast trim, splitting into parts, volume, stripping metadata.
+- Operations that re-encode the video (compress, downscale, trim, speed, enhancements and others) kept
+  only one of several audio tracks. Now all of them are kept, with their names.
+- Videos with a cover inside (common in downloaded MP4s): GIF, frames, speed and exact trim took the cover
+  instead of the video itself.
+- Videos with an odd frame size (for example 641×361) failed to encode to H.264 / H.265; the size is now rounded to even.
+- Audio operations on a video without audio failed with a cryptic ffmpeg error; now they say "The video has no audio".
+- Converting audio to M4A and FLAC lost the cover.
+- An image with transparency got a black background in JPG; now it is white.
+- H.265 from a 10-bit or 4:4:4 video came out the same and might not play on phones and TVs; now it is always 8-bit 4:2:0.
+
 ## [1.0.0] - 2026-10-20
 
 First release.
