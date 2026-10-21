@@ -6,7 +6,7 @@
 Формат — [Keep a Changelog](https://keepachangelog.com/ru/1.1.0/), номера версий — [SemVer](https://semver.org/lang/ru/):
 `МАЖОР.МИНОР.ПАТЧ` (минор — новые возможности, патч — исправления).
 
-## [Не выпущено]
+## [1.1.0] — 2026-10-21
 
 ### Добавлено
 - **11 тем оформления**: Акрил (прежняя тема, по умолчанию), Modern, Светлая, Неон, Dracula, Nord, Кодек, Закат,
@@ -72,5 +72,6 @@
 - Папка `dev/` для тех, кто хочет переделывать меню: генераторы файлов, словарь перевода и проверялка
   (комментарии на английском; подсказки в `paths.nss` — на языке меню).
 
-[Не выпущено]: https://github.com/SolidSnake1765/nilesoft-shell-preset/compare/v1.0.0...HEAD
+[Не выпущено]: https://github.com/SolidSnake1765/nilesoft-shell-preset/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/SolidSnake1765/nilesoft-shell-preset/releases/tag/v1.1.0
 [1.0.0]: https://github.com/SolidSnake1765/nilesoft-shell-preset/releases/tag/v1.0.0

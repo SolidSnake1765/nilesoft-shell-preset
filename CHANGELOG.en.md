@@ -6,7 +6,7 @@ All notable changes to the preset. Newest versions first.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versions follow [SemVer](https://semver.org/):
 `MAJOR.MINOR.PATCH` (minor = new features, patch = fixes).
 
-## [Unreleased]
+## [1.1.0] - 2026-10-21
 
 ### Added
 - **11 menu themes**: Acrylic (the old theme, default), Modern, Light, Neon, Dracula, Nord, Codec, Sunset,
@@ -72,5 +72,6 @@ First release.
 - A `dev/` folder for those who want to change the menu: file generators, the translation dictionary and a checker
   (comments in English; the hints in `paths.nss` are in the menu language).
 
-[Unreleased]: https://github.com/SolidSnake1765/nilesoft-shell-preset/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/SolidSnake1765/nilesoft-shell-preset/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/SolidSnake1765/nilesoft-shell-preset/releases/tag/v1.1.0
 [1.0.0]: https://github.com/SolidSnake1765/nilesoft-shell-preset/releases/tag/v1.0.0
