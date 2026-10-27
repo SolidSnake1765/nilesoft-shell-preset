@@ -321,6 +321,8 @@ A few quick tips:
 
 - **[Local VOT](https://github.com/SolidSnake1765/local-vot)**: Russian voice-over for your own videos with Yandex voices
   (via Yandex Disk or Google Drive), a Windows app.
+- **[RTSS Overlay Preset](https://github.com/SolidSnake1765/rtss-overlay-preset)**: an in-game monitoring overlay for RivaTuner
+  in the i2HARD style: no HWiNFO, live RAM frequency and timings; the setup adapts it to your hardware.
 - **Snake VPN**: my personal VPN service for users in Russia:
   - [Telegram bot](https://t.me/SnakeVPNServiceBot).
   - [snakeservice.tech](https://snakeservice.tech): the service website. Use it instead of the bot or together with it:

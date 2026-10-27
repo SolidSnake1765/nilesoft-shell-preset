@@ -320,6 +320,8 @@ $lc_exe_user = 'D:\Soft\LosslessCut\LosslessCut.exe'
 
 - **[Local VOT](https://github.com/SolidSnake1765/local-vot)** — закадровый перевод своих видео на русский голосами Яндекса
   (через Яндекс Диск или Google Диск), приложение для Windows.
+- **[RTSS Overlay Preset](https://github.com/SolidSnake1765/rtss-overlay-preset)** — оверлей мониторинга в играх для RivaTuner
+  в стиле i2HARD: без HWiNFO, с живой частотой и таймингами оперативной памяти; установщик сам подстраивает его под железо.
 - **Snake VPN** — мой личный VPN-сервис для россиян:
   - [Бот в Telegram](https://t.me/SnakeVPNServiceBot).
   - [snakeservice.tech](https://snakeservice.tech) — сайт сервиса. Можно пользоваться вместо бота, а можно вместе с ним:
